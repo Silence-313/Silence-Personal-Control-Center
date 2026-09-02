@@ -1,0 +1,31 @@
+{
+  "name": "Silence Personal Control Center",
+  "short_name": "Silence",
+  "description": "Personal Research Operating System — control surface for the personal compute environment.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0c0e",
+  "theme_color": "#0a0c0e",
+  "orientation": "landscape-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
