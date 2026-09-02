@@ -1,0 +1,42 @@
+# Silence Control Center — Project Registry (read-only monitoring)
+#
+# 安全约束：
+#   - 每个项目只执行只读 git 命令：`git status --porcelain`、`git branch --show-current`、`git log -1`。
+#   - 绝不执行 git add/commit/push/pull/reset/checkout/clean。
+#   - 路径由用户显式填写；不会扫描 home 目录。
+
+projects:
+  - id: coding-video
+    name: coding-video
+    path: /Users/xuejingchen/Desktop/vscode/coding-video
+    type: git
+
+  - id: lumoguide
+    name: LUMOGUIDE
+    path: /Users/xuejingchen/Desktop/vscode/LUMOGUIDE
+    type: git
+
+  - id: instant-messaging
+    name: 即时通讯
+    path: /Users/xuejingchen/Desktop/vscode/即时通讯
+    type: git
+
+  - id: booking-platform
+    name: 预订平台
+    path: /Users/xuejingchen/Desktop/vscode/预订平台
+    type: git
+
+  - id: obsidian-plugin
+    name: obsidian_plugin
+    path: /Users/xuejingchen/Desktop/vscode/obsidian_plugin
+    type: git
+
+  - id: lumotrip
+    name: lumotrip
+    path: /Users/xuejingchen/Desktop/vscode/lumotrip
+    type: git
+
+  - id: second-brain
+    name: Second Brain
+    path: /Users/xuejingchen/Desktop/vscode/Second_brain_for_Silence
+    type: git
