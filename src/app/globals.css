@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Silence Personal Control Center — Design Tokens (dark-first)
+   ============================================================ */
+:root {
+  /* Surfaces */
+  --background: #0a0c0e;
+  --surface: #111417;
+  --surface-2: #171b1f;
+  --surface-3: #1d2227;
+
+  /* Borders */
+  --border-soft: #242a31;
+  --border-strong: #313944;
+
+  /* Text */
+  --text-primary: #e7eaee;
+  --text-secondary: #a6adb7;
+  --text-muted: #6b737c;
+
+  /* Accent (brand / interactive) */
+  --accent: #59b7ff;
+  --accent-dim: #1b3d57;
+
+  /* Status */
+  --success: #3fb950;
+  --warning: #d29922;
+  --error: #f85149;
+  --info: #58a6ff;
+
+  /* Elevation */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-y: none;
+}
+
+/* Touch-friendly sizing for iOS Safari: prevent text auto-zoom on focus */
+input,
+button,
+textarea,
+select {
+  font-size: 16px;
+  touch-action: manipulation;
+}
+
+/* Prevent iOS tap highlight flash */
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--accent-dim);
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   Scrollbars (quiet, desktop only — iPad uses overlay scroll)
+   ============================================================ */
+@media (hover: hover) and (pointer: fine) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 8px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+/* ============================================================
+   Focus visibility (keyboard + touch)
+   ============================================================ */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
