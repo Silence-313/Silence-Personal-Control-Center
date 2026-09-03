@@ -1,180 +1,223 @@
 # Silence Personal Control Center v0.1
 
-## 总体路线
+> **Personal Research Operating System / Personal Control Center**
+>
+> 将 iPad Air M4 打造成个人科研、Coding、AI Agent、Robotics
+> 与数据基础设施的统一控制台。
 
-```text
-Phase 0
-Environment & Capability Audit
-        ↓
-Phase 1
-System Architecture
-        ↓
-Phase 2
-UI/UX Prototype
-        ↓
-Phase 3
-Project Bootstrap & Development Infrastructure
-        ↓
-Phase 4
-Mac Node Agent
-        ↓
-Phase 5
-Control Center Backend
-        ↓
-Phase 6
-Dashboard
-        ↓
-Phase 7
-Projects & Git
-        ↓
-Phase 8
-Services & Docker
-        ↓
-Phase 9
-Power / Sleep / Wake
-        ↓
-Phase 10
-Agent Monitor
-        ↓
-Phase 11
-Research Module
-        ↓
-Phase 12
-Robotics Module
-        ↓
-Phase 13
-Personal Data Center / 2TB SSD
-        ↓
-Phase 14
-Security Hardening
-        ↓
-Phase 15
-Remote Access / Tailscale
-        ↓
-Phase 16
-PWA / iPad Optimization
-        ↓
-Phase 17
-Integration Testing
-        ↓
-Phase 18
-Deployment
-        ↓
-Phase 19
-Documentation
+------------------------------------------------------------------------
+
+## 1. Project Vision
+
+``` text
+                    iPad Air M4
+                         │
+                         ▼
+              ┌─────────────────────┐
+              │ Silence Personal    │
+              │ Control Center      │
+              └──────────┬──────────┘
+                         │
+                         ▼
+                  Mac / Nodes
+                         │
+          ┌──────────────┼──────────────┐
+          ▼              ▼              ▼
+       Projects        Agents        Research
+          │              │              │
+          └──────────────┼──────────────┘
+                         ▼
+                  Personal Data
+                         │
+                         ▼
+                      2TB SSD
 ```
 
----
+长期目标：
 
-# Phase 0 — 环境与能力审计
+> **Silence Personal Control Center → Personal Research Operating
+> System**
 
-### 目标
+当前目标：
 
-回答一个最基本的问题：
+> **先把 iPad Air M4 做成真正可用的 Personal Control Center v0.1。**
 
-> **我现在这台 Mac 到底能够为 Personal Control Center 提供什么？**
+------------------------------------------------------------------------
 
-这一阶段**不写项目代码、不安装软件、不修改系统配置**。
+# 2. Current Status
 
-### 审计内容
+截至当前：
 
-```text
-Mac
-├── macOS
-├── CPU
-├── RAM
-├── Disk
-├── Network
-│
-├── Homebrew
-├── Node
-├── npm / pnpm
-├── Python
-├── uv / Conda
-├── Git
-├── Docker
-├── SSH
-├── Tailscale
-│
-├── 当前端口
-├── 当前运行服务
-│
-├── Sleep
-├── Wake
-└── Power Management
+  Phase      名称                              状态
+  ---------- --------------------------------- -------------
+  Phase 0    Environment & Capability Audit    ✅ Complete
+  Phase 1    System Architecture               ✅ Complete
+  Phase 2    UI / UX Prototype                 ✅ Complete
+  Phase 3    Backend + Node Foundation         ✅ Complete
+  Phase 4    Frontend Integration + Realtime   ✅ Complete
+  Phase 5    Projects Control Plane            ✅ Complete
+  Phase 6    Agent Control Plane               🚧 Next
+  Phase 7    Session & Activity Plane          ⏳ Planned
+  Phase 8    Research Control Plane            ⏳ Planned
+  Phase 9    Robotics Control Plane            ⏳ Planned
+  Phase 10   Personal AI Data Center           ⏳ Planned
+  Phase 11   Execution Plane                   ⏳ Planned
+  Phase 12   Security Hardening                ⏳ Planned
+  Phase 13   Remote Access / Tailscale         ⏳ Planned
+  Phase 14   PWA / iPad Optimization           ⏳ Planned
+  Phase 15   Observability & Monitoring        ⏳ Planned
+  Phase 16   Full Integration / E2E            ⏳ Planned
+  Phase 17   Deployment                        ⏳ Planned
+  Phase 18   Documentation                     ⏳ Planned
+
+> Phase 数量与边界允许根据实际开发情况调整。README
+> 是当前路线图，而不是不可修改的合同。
+
+------------------------------------------------------------------------
+
+# 3. Architecture
+
+当前系统采用：
+
+``` text
+iPad Safari / PWA
+        │
+        │ LAN / future Tailscale
+        ▼
+   Next.js Frontend
+        │
+        │ REST / SSE
+        ▼
+    FastAPI Backend
+        │
+        ▼
+   Control Plane
+        │
+        ├── Node
+        ├── Projects
+        ├── Agents
+        ├── Sessions
+        ├── Research
+        ├── Robotics
+        └── Data Center
+        │
+        ▼
+      Adapters
+        │
+        ▼
+Mac / Linux / Future Mac Studio / GPU Server
 ```
 
-特别重要的是：
+核心设计原则：
 
-### Sleep / Wake
+-   **Local-first**
+-   **Control Plane 与 Execution Plane 分离**
+-   **Read-only 优先**
+-   **Adapter-oriented**
+-   **Mock / Real seam**
+-   **设备统一 Device Model**
+-   **明确 offline / sleeping / stale**
+-   **最小权限**
+-   **不要为了 UI 而引入不必要的基础设施**
 
-需要实际验证：
+------------------------------------------------------------------------
 
-```text
-Awake
- ↓
-Sleep
- ↓
-iPad / 网络
- ↓
-Wake
- ↓
-Mac Online
+# 4. Current Technical Stack
+
+## Frontend
+
+-   Next.js
+-   React
+-   TypeScript
+-   Tailwind CSS
+-   App Router
+-   Vitest
+-   React Testing Library
+
+## Backend
+
+-   FastAPI
+-   Python
+-   Pydantic
+-   SQLite
+-   YAML Registry
+
+## Communication
+
+``` text
+REST
+  +
+SSE
 ```
 
-### 输出
+WebSocket
+不再作为第一版实时通信的默认方案；除非后续出现明确需要双向长连接的场景。
 
-```text
-docs/
-└── phase-0-environment-audit.md
+## Infrastructure
+
+-   macOS
+-   Docker Desktop
+-   Git
+-   SSH
+-   Homebrew
+-   uv / Conda
+-   future Tailscale
+
+------------------------------------------------------------------------
+
+# 5. Phase Roadmap
+
+## Phase 0 --- Environment & Capability Audit
+
+目标：
+
+> 知道现有 Mac 能提供什么能力，并确认哪些能力可以安全复用。
+
+审计：
+
+-   macOS / CPU / RAM / Disk
+-   Homebrew
+-   Node / npm / pnpm
+-   Python / uv / Conda
+-   Git / SSH
+-   Docker
+-   Network
+-   Power / Sleep / Wake
+-   当前服务
+
+输出：
+
+``` text
+docs/phase-0-environment-audit.md
 ```
 
-### 完成标准
+状态：**Complete**
 
-我们知道：
+------------------------------------------------------------------------
 
-* 当前环境有什么
-* 什么可以直接复用
-* 什么缺失
-* 什么需要安装
-* Mac 能否可靠 Sleep/Wake
-* 网络环境是否适合 Tailscale
-* 哪些东西绝对不能动
+## Phase 1 --- System Architecture
 
+确定：
 
-### 结果
+-   Frontend
+-   Backend
+-   Database
+-   Network
+-   Authentication
+-   Storage
+-   Realtime
+-   Device Model
+-   Adapter System
+-   Deployment
 
-[Phase 0 汇报文档](docs/phase-0-environment-audit.md)
+核心：
 
----
-
-# Phase 1 — Architecture
-
-这一阶段才正式确定技术路线。
-
-### 需要确定
-
-```text
-Frontend
-Backend
-Database
-Network
-Authentication
-Storage
-Realtime
-Device Manager
-Adapter System
-Deployment
-```
-
-最终形成：
-
-```text
+``` text
 iPad
  ↓
-PWA
+Web / PWA
  ↓
-Tailscale
+Network
  ↓
 Next.js
  ↓
@@ -184,42 +227,22 @@ Control Plane
  ↓
 Adapters
  ↓
-Mac
+Nodes
 ```
 
-### 输出
+状态：**Complete**
 
-```text
-docs/
-├── architecture.md
-├── api-design.md
-├── data-model.md
-└── security-design.md
-```
+------------------------------------------------------------------------
 
-### 完成标准
+## Phase 2 --- UI / UX Prototype
 
-回答：
+目标：
 
-> **以后增加 Mac Studio、Linux Server、GPU Server 时是否需要重构？**
+> 先确定 iPad 上的 Personal Control Center 应该长什么样。
 
-### 结果
+主要页面：
 
-[Phase 1 汇报文档](docs/phase-1-architecture.md)
-
----
-
-# Phase 2 — UI / UX Prototype
-
-这一阶段先**设计体验，不接真实后端**。
-
-重点是：
-
-> iPad 到底应该长什么样。
-
-设计：
-
-```text
+``` text
 Dashboard
 Devices
 Projects
@@ -230,252 +253,257 @@ Data Center
 Activity
 ```
 
-重点优化：
+重点：
 
-* 13" iPad 横屏
-* Touch
-* Dark Mode
-* 信息密度
-* Navigation
-* Cards
-* Status
-* Command Center 风格
+-   13" iPad
+-   横屏优先
+-   Touch
+-   Dark Mode
+-   信息密度
+-   Command Center 风格
 
-### 输出
+状态：**Complete**
 
-```text
-docs/
-└── ui-design.md
-```
+------------------------------------------------------------------------
 
-以及可以直接运行的前端 prototype。
-
-### 完成标准
-
-拿 iPad 实际打开后：
-
-> **看起来已经像一个真正可以使用的 Personal Control Center。**
-
----
-
-# Phase 3 — Project Foundation
-
-开始正式写代码。
+## Phase 3 --- Backend + Node Foundation
 
 建立：
 
-```text
-silence-personal-control-center/
-│
-├── apps/
-│   ├── web/
-│   └── api/
-│
-├── packages/
-│   └── shared/
-│
-├── data/
-│
-├── docs/
-├── scripts/
-├── tests/
-└── README.md
-```
-
-技术栈暂定：
-
-```text
-Next.js
-React
-TypeScript
+``` text
 FastAPI
-Python
-SQLite
-Pydantic
-WebSocket
+  │
+  ├── Node
+  ├── Metrics
+  ├── Services
+  ├── Power
+  ├── Projects
+  ├── Activities
+  ├── Commands
+  └── Events
 ```
 
-### 完成标准
+实现：
 
-做到：
+-   Node Agent
+-   System metrics
+-   Docker read-only
+-   Git read-only
+-   Storage
+-   Power
+-   Sleep / Wake
+-   Device pairing
+-   Access token
+-   SSE 基础设施
 
-```text
-iPad
- ↓
-Next.js
- ↓
-FastAPI
- ↓
-API Response
+状态：**Complete**
+
+------------------------------------------------------------------------
+
+## Phase 4 --- Frontend Integration + Realtime
+
+核心目标：
+
+``` text
+REST initial state
+        +
+SSE realtime
+        +
+Polling fallback
+        +
+Offline / Stale state
 ```
 
-跑通第一条链路。
+实现：
 
----
+-   Real API client
+-   SSE RealtimeProvider
+-   Device authentication
+-   Dashboard realtime
+-   Sleep / Wake UI
+-   Offline / stale distinction
+-   Frontend test infrastructure
+-   iPad LAN validation
 
-# Phase 4 — Mac Control Plane
+状态：**Complete**
 
-这是整个项目真正的核心。
+------------------------------------------------------------------------
+
+## Phase 5 --- Projects Control Plane
+
+目标：
+
+> 将 Project 从静态展示升级为真实的只读 Project Control Plane。
+
+当前 Project：
+
+``` text
+Project
+├── node_id
+├── repositoryPath
+├── branch
+├── remote
+├── ahead
+├── behind
+├── head
+├── workingTree
+├── health
+└── lastCommit
+```
+
+能力：
+
+-   Project list
+-   Project detail
+-   Real Git status
+-   Remote
+-   Ahead / Behind
+-   Full HEAD
+-   Node association
+-   Health aggregation
+-   30s refresh
+-   Mock / Real alignment
+
+安全边界：
+
+> Git 全程只读。
+
+状态：**Complete**
+
+------------------------------------------------------------------------
+
+# 6. Phase 6 --- Agent Control Plane
+
+## Goal
+
+Phase 6 不负责开发 Coding Agent 本体。
+
+它负责：
+
+> **让 Control Center 能够认识、注册、观察和组织 Agent。**
+
+目标模型：
+
+``` text
+Node
+ │
+ └── Project
+       │
+       ├── Agent
+       │     └── Session
+       │
+       └── Activity
+```
+
+核心对象：
+
+``` text
+Agent
+Agent Session
+Activity association
+Project association
+```
+
+### Agent
+
+建议字段：
+
+``` text
+id
+name
+type
+description
+status
+node_id
+current_project_id
+current_session_id
+current_task
+last_activity_at
+capabilities
+metadata
+```
+
+状态：
+
+``` text
+offline
+idle
+running
+error
+unknown
+```
+
+### Phase 6 必须实现
+
+-   Agent Registry
+-   Agent domain model
+-   Agent REST API
+-   Agent list
+-   Agent detail
+-   Agent status
+-   Agent → Project association
+-   Agent Session read model
+-   Activity → Agent association
+-   Activity → Session association
+-   Activity → Project association
+-   Dashboard Agent summary
+-   Frontend / Backend tests
+-   iPad validation
+
+### Phase 6 明确禁止
+
+-   不开发 Coding Agent
+-   不修改 Second Brain
+-   不执行 shell
+-   不执行任意命令
+-   不执行 Git write
+-   不 commit / push / pull / checkout / reset
+-   不启动训练
+-   不控制机器人
+-   不执行 Research workflow
+-   不实现 Agent execution endpoint
+
+原则：
+
+> **Phase 6 负责"认识 Agent"，Execution Plane 才负责"驱动 Agent"。**
+
+状态：**Next**
+
+------------------------------------------------------------------------
+
+# 7. Phase 7 --- Session & Activity Plane
+
+目标：
+
+> 建立 Agent Session 与统一 Activity Model。
+
+最终：
+
+``` text
+Project
+   │
+   ├── Agent
+   │    └── Session
+   │          └── Activities
+   │
+   └── Git
+```
+
+关注：
+
+-   Session lifecycle
+-   Activity timeline
+-   Project / Agent / Node 关联
+-   Dashboard activity feed
+-   Realtime activity
+
+------------------------------------------------------------------------
+
+# 8. Phase 8 --- Research Control Plane
 
 建立：
 
-```text
-Mac
-│
-└── Control Plane
-     │
-     ├── System Adapter
-     ├── Docker Adapter
-     ├── Git Adapter
-     ├── Storage Adapter
-     ├── Power Adapter
-     └── Network Adapter
-```
-
-其中：
-
-### System
-
-```text
-CPU
-RAM
-Disk
-Network
-Uptime
-```
-
-### Docker
-
-```text
-Running
-Stopped
-Images
-Containers
-```
-
-### Git
-
-```text
-Branch
-Commit
-Dirty
-Ahead
-Behind
-```
-
-### Power
-
-```text
-Awake
-Sleeping
-Wake
-Sleep
-```
-
----
-
-# Phase 5 — Dashboard + Devices
-
-这是第一个真正意义上的 MVP。
-
-iPad：
-
-```text
-Dashboard
-
-MacBook Pro M3
-● Awake
-
-CPU       23%
-RAM       18.4GB
-Storage   1.2TB
-Docker    ●
-Tailscale ●
-
-[ Sleep ]
-```
-
-Devices：
-
-```text
-Devices
-
-MacBook Pro M3
-● Awake
-
-[ Sleep ]
-```
-
-未来：
-
-```text
-MacBook Pro M3
-Mac Studio M4 Max
-Linux Server
-```
-
-全部使用统一 Device Model。
-
----
-
-# Phase 6 — Projects + Agents
-
-加入：
-
-```text
-Projects
-```
-
-例如：
-
-```text
-Second Brain
-G1
-N2
-GMR
-GVHMR
-Research
-```
-
-以及：
-
-```text
-Agents
-```
-
-例如：
-
-```text
-Coding Agent
-Research Agent
-Robotics Agent
-Data Agent
-Review Agent
-```
-
-但这里依然：
-
-> **监控优先，不开发 Agent 本体。**
-
-尤其不要在这个 Phase 修改你的 Second Brain。
-
-只做：
-
-```text
-Adapter
- ↓
-读取状态
- ↓
-Control Center
-```
-
----
-
-# Phase 7 — Research + Robotics
-
-建立：
-
-```text
+``` text
 Research
 ├── Papers
 ├── Projects
@@ -485,9 +513,24 @@ Research
 └── Reports
 ```
 
-以及：
+第一阶段重点：
 
-```text
+-   Status
+-   Metadata
+-   Experiments
+-   Logs
+-   Metrics
+-   Reports
+
+不立即实现完整 Research Agent。
+
+------------------------------------------------------------------------
+
+# 9. Phase 9 --- Robotics Control Plane
+
+建立：
+
+``` text
 Robotics
 ├── G1
 ├── N2
@@ -498,28 +541,25 @@ Robotics
 └── Motion Dataset
 ```
 
-第一阶段主要做：
+重点：
 
-```text
-Status
-Experiment
-Logs
-Metrics
-```
+-   Simulation status
+-   Training status
+-   Experiment metadata
+-   Logs
+-   Metrics
+-   Checkpoints
 
-而不是直接远程控制机器人。
+不立即开放高风险机器人执行控制。
 
----
+------------------------------------------------------------------------
 
-# Phase 8 — Personal AI Data Center
+# 10. Phase 10 --- Personal AI Data Center
 
-接入你的 2TB SSD。
+接入 2TB SSD：
 
-设计：
-
-```text
+``` text
 Personal AI Data Center
-│
 ├── datasets
 ├── models
 ├── papers
@@ -532,76 +572,115 @@ Personal AI Data Center
 └── backups
 ```
 
-Dashboard：
+实现：
 
-```text
-2TB SSD
+-   Storage overview
+-   Category statistics
+-   Capacity
+-   File metadata
+-   Data organization
 
-Used     1.37TB
-Free     630GB
+之后再考虑真正的文件管理。
 
-Datasets       510GB
-Models         320GB
-Experiments    420GB
-Papers          18GB
+------------------------------------------------------------------------
+
+# 11. Phase 11 --- Execution Plane
+
+这是整个系统从：
+
+> Observe
+
+进入：
+
+> Act
+
+的阶段。
+
+可能包括：
+
+``` text
+Agent execution
+Docker control
+Terminal / command execution
+Git write operations
+Research workflows
+Robotics training
+Simulation control
 ```
 
-这个阶段才真正开始：
+所有执行能力必须：
 
-> **Storage Management**
+-   Authentication
+-   Authorization
+-   Capability based permission
+-   Audit log
+-   Confirmation
+-   Rate limiting
+-   Safe command boundary
 
----
+**Execution Plane 不应提前进入 Phase 6。**
 
-# Phase 9 — Security + Remote Access + PWA
+------------------------------------------------------------------------
 
-这一阶段进行安全加固。
+# 12. Phase 12 --- Security Hardening
 
-### 网络
+重点：
 
-```text
-LAN
- ↓
-Tailscale
- ↓
-HTTPS
-```
+-   Authentication
+-   Authorization
+-   Device identity
+-   Capability permissions
+-   Session management
+-   CORS
+-   Rate limiting
+-   Audit log
+-   Secret handling
+-   API hardening
+-   Command permission
 
-### Security
+特别保护：
 
-```text
-Authentication
-Authorization
-Session
-API Security
-CORS
-Rate Limit
-Audit Log
-Command Permission
-```
-
-特别是：
-
-```text
-Sleep
-Wake
+``` text
+Sleep / Wake
 Docker
 Agent
 Training
+Robot
+Git Write
+Shell
 ```
 
-这些属于：
+------------------------------------------------------------------------
 
-> **Control Operations**
+# 13. Phase 13 --- Remote Access / Tailscale
 
-不能像普通 GET API 一样裸奔。
+目标：
 
----
+``` text
+iPad
+ ↓
+Tailscale
+ ↓
+Mac / Mac Studio / Server
+```
 
-### PWA
+支持未来：
 
-最终：
+``` text
+MacBook Pro
+Mac Studio
+Linux Server
+GPU Server
+Cloud GPU
+```
 
-```text
+------------------------------------------------------------------------
+
+# 14. Phase 14 --- PWA / iPad Optimization
+
+目标：
+
+``` text
 Safari
  ↓
 Add to Home Screen
@@ -609,181 +688,364 @@ Add to Home Screen
 Silence Personal Control Center
 ```
 
----
+优化：
 
-# Phase 10 — Full Integration Test
+-   iPad viewport
+-   Touch targets
+-   Orientation
+-   Offline shell
+-   Installability
+-   Battery usage
+-   Background behavior
+-   Reconnection
 
-测试整个系统：
+------------------------------------------------------------------------
 
-```text
+# 15. Phase 15 --- Observability & Monitoring
+
+统一观察：
+
+``` text
+Node
+Service
+Agent
+Session
+Research
+Robotics
+Data
+```
+
+建立：
+
+-   Health
+-   Metrics
+-   Logs
+-   Events
+-   Alerts
+
+------------------------------------------------------------------------
+
+# 16. Phase 16 --- Full Integration / E2E
+
+完整链路：
+
+``` text
 iPad
  ↓
-Tailscale
+Network
  ↓
 Web
  ↓
 FastAPI
  ↓
-Mac
+Control Plane
  ↓
-System / Docker / Git / Storage
+Node
+ ↓
+Adapters
+ ↓
+Mac
 ```
 
 测试：
 
-### 正常流程
+-   Awake
+-   Sleep
+-   Wake
+-   Offline
+-   Reconnect
+-   Docker failure
+-   Backend failure
+-   Network interruption
+-   Agent offline
+-   Project unavailable
+-   stale data
 
-```text
-Wake
- ↓
-Online
- ↓
-Services Ready
- ↓
-Dashboard
-```
+------------------------------------------------------------------------
 
-### Sleep
+# 17. Phase 17 --- Deployment
 
-```text
-Dashboard
- ↓
-Sleep
- ↓
-Mac Sleeping
- ↓
-Wake
- ↓
-Online
-```
+目标：
 
-### 网络
-
-```text
-LAN
-Remote
-Disconnect
-Reconnect
-```
-
-### 异常
-
-```text
-Mac crash
-FastAPI crash
-Docker crash
-Tailscale disconnect
-Network interruption
-```
-
----
-
-# Phase 11 — Deployment + Documentation
-
-最终形成：
-
-```text
+``` text
 一键启动
 一键停止
 一键更新
 ```
 
-并完成：
+最终支持：
 
-```text
+-   Local development
+-   Local production
+-   MacBook deployment
+-   Future Mac Studio deployment
+
+------------------------------------------------------------------------
+
+# 18. Phase 18 --- Documentation
+
+最终文档：
+
+``` text
 README.md
 ARCHITECTURE.md
+API.md
 DEPLOYMENT.md
 SECURITY.md
 TROUBLESHOOTING.md
-API.md
 ```
 
-最终别人即使不知道项目内部实现，也能理解它。
+并保留：
 
----
+``` text
+docs/
+├── phase-0-*
+├── phase-1-*
+├── phase-2-*
+├── phase-3-*
+├── phase-4-*
+├── phase-5-*
+└── phase-6-*
+```
 
-# 最终路线图
+------------------------------------------------------------------------
 
-我把它压缩成一张图：
+# 19. Core Architectural Rules
 
-```text
-                    Silence Personal Control Center
-                                  │
-                                  ▼
-                         ┌─────────────────┐
-                         │ Phase 0         │
-                         │ Environment     │
-                         │ Audit           │
-                         └────────┬────────┘
-                                  │
-                                  ▼
-                         ┌─────────────────┐
-                         │ Phase 1         │
-                         │ Architecture    │
-                         └────────┬────────┘
-                                  │
-                                  ▼
-                         ┌─────────────────┐
-                         │ Phase 2         │
-                         │ UI/UX Prototype │
-                         └────────┬────────┘
-                                  │
-                                  ▼
-                         ┌─────────────────┐
-                         │ Phase 3         │
-                         │ Foundation      │
-                         └────────┬────────┘
-                                  │
-                                  ▼
-                         ┌─────────────────┐
-                         │ Phase 4         │
-                         │ Control Plane   │
-                         └────────┬────────┘
-                                  │
-                                  ▼
-                         ┌─────────────────┐
-                         │ Phase 5         │
-                         │ Dashboard       │
-                         │ + Devices       │
-                         └────────┬────────┘
-                                  │
-                                  ▼
-                         ┌─────────────────┐
-                         │ Phase 6         │
-                         │ Projects        │
-                         │ + Agents        │
-                         └────────┬────────┘
-                                  │
-                                  ▼
-                         ┌─────────────────┐
-                         │ Phase 7         │
-                         │ Research        │
-                         │ + Robotics      │
-                         └────────┬────────┘
-                                  │
-                                  ▼
-                         ┌─────────────────┐
-                         │ Phase 8         │
-                         │ Data Center     │
-                         └────────┬────────┘
-                                  │
-                                  ▼
-                         ┌─────────────────┐
-                         │ Phase 9         │
-                         │ Security/PWA    │
-                         └────────┬────────┘
-                                  │
-                                  ▼
-                         ┌─────────────────┐
-                         │ Phase 10        │
-                         │ Integration     │
-                         └────────┬────────┘
-                                  │
-                                  ▼
-                         ┌─────────────────┐
-                         │ Phase 11        │
-                         │ Deployment      │
-                         │ + Documentation │
-                         └─────────────────┘
+## Rule 1 --- Local-first
+
+第一版不依赖：
+
+-   AWS
+-   Firebase
+-   Supabase
+-   SaaS database
+
+------------------------------------------------------------------------
+
+## Rule 2 --- Control Plane ≠ Execution Plane
+
+``` text
+Control Plane
+    ↓
+Observe / Organize
+
+Execution Plane
+    ↓
+Act
+```
+
+必须保持边界。
+
+------------------------------------------------------------------------
+
+## Rule 3 --- Read-only first
+
+尤其：
+
+``` text
+Git
+Docker
+Research
+Robotics
+Data
+```
+
+先观察，再执行。
+
+------------------------------------------------------------------------
+
+## Rule 4 --- Do not modify existing environments blindly
+
+任何涉及：
+
+-   Second Brain
+-   Docker
+-   Python
+-   Conda
+-   MuJoCo
+-   Robotics
+-   Git
+-   SSH
+
+的操作必须先审计。
+
+------------------------------------------------------------------------
+
+## Rule 5 --- Do not invent state
+
+明确区分：
+
+``` text
+ONLINE
+SLEEPING
+OFFLINE
+STALE
+UNKNOWN
+```
+
+旧数据不能冒充实时数据。
+
+------------------------------------------------------------------------
+
+## Rule 6 --- iPad is the Control Surface
+
+iPad 不承担主要计算。
+
+``` text
+iPad
+  ↓
+Control Surface
+
+Mac / Server
+  ↓
+Compute / Execution
+```
+
+------------------------------------------------------------------------
+
+# 20. Future Hardware
+
+当前：
+
+``` text
+iPad Air M4
+MacBook Pro M3 Pro 36GB
+2TB External SSD
+```
+
+未来可能增加：
+
+``` text
+Mac Studio
+Linux Server
+GPU Server
+Cloud GPU
+```
+
+统一抽象为：
+
+``` text
+Node
+```
+
+因此增加 Mac Studio 不应该要求重构整个系统。
+
+------------------------------------------------------------------------
+
+# 21. Current Development Principle
+
+每个 Phase 都遵循：
+
+``` text
+Audit
+  ↓
+Analyze
+  ↓
+Design
+  ↓
+Plan
+  ↓
+User Approval
+  ↓
+Implement
+  ↓
+Test
+  ↓
+Verify
+  ↓
+Document
+  ↓
+Next Phase
+```
+
+**未获得用户确认前，不进入下一阶段的实现。**
+
+------------------------------------------------------------------------
+
+# 22. Current Next Step
+
+当前 Phase 5 已完成。
+
+下一步：
+
+# Phase 6 --- Agent Control Plane
+
+第一步不是写 Agent。
+
+而是：
+
+``` text
+Audit existing Agent architecture
+        ↓
+Design Agent domain model
+        ↓
+Design Registry
+        ↓
+Design Session read model
+        ↓
+Associate Activity / Project
+        ↓
+Implement read-only Agent Control Plane
+        ↓
+Test
+        ↓
+iPad verification
+```
+
+------------------------------------------------------------------------
+
+# 23. Project Philosophy
+
+这个项目不是：
+
+> 一个漂亮的 Dashboard。
+
+也不是：
+
+> 一个远程 Terminal。
+
+最终目标是：
+
+> **一个属于个人开发者的 Local-first Personal Research Operating
+> System。**
+
+iPad 是它的：
+
+> **Control Surface**
+
+Mac / Mac Studio / Server 是它的：
+
+> **Compute & Execution Infrastructure**
+
+Agent 是它的：
+
+> **Cognitive / Automation Layer**
+
+2TB SSD 是它的：
+
+> **Personal Data Layer**
+
+最终形成：
+
+``` text
+                    Personal Research OS
+                            │
+          ┌─────────────────┼─────────────────┐
+          ▼                 ▼                 ▼
+      Control Plane     Cognitive Layer    Data Layer
+          │                 │                 │
+          ▼                 ▼                 ▼
+        Nodes             Agents             SSD
+        Projects          Sessions           Datasets
+        Research          Activities         Models
+        Robotics          Workflows           Memory
+          │                 │                 │
+          └─────────────────┼─────────────────┘
+                            ▼
+                     Execution Plane
+                            │
+             ┌──────────────┼──────────────┐
+             ▼              ▼              ▼
+           Mac           Mac Studio       Server
 ```
