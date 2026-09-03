@@ -49,6 +49,8 @@ export const activities: Activity[] = [
     message: "Coding Agent went idle",
     detail: "G1 reward configuration reviewed",
     nodeId: "macbook-pro-m3-pro",
+    agentId: "coding-agent",
+    projectId: "g1-mechdance",
   },
   {
     id: "evt-006",

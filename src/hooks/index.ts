@@ -7,11 +7,17 @@ import * as api from "@/lib/api";
 import type {
   Activity,
   Agent,
+  AgentSession,
   Command,
+  Dataset,
+  Experiment,
   Node,
+  Paper,
   PowerStatus,
   Project,
-  ResearchItem,
+  ResearchNote,
+  ResearchProject,
+  ResearchReport,
   Robot,
   RoboticsExperiment,
   Service,
@@ -20,6 +26,8 @@ import type {
   Task,
   TrainingRun,
 } from "@/types";
+
+import type { ResearchEntity, ResearchTypeKey } from "@/lib/research";
 
 /**
  * Data hooks. Each hook wraps a single API function so components never touch
@@ -116,15 +124,126 @@ export function useProject(id: string) {
 }
 
 export function useAgents() {
-  return useAsync<Agent[]>(api.getAgents);
+  return useAsync<Agent[]>(api.getAgents, MEDIUM_REFRESH_MS);
+}
+
+export function useAgent(id: string) {
+  return useAsync<Agent | undefined>(() => api.getAgent(id));
+}
+
+export function useAgentSessions(id: string) {
+  return useAsync<AgentSession[]>(() => api.getAgentSessions(id));
+}
+
+export function useSessions() {
+  return useAsync<AgentSession[]>(api.getSessions, MEDIUM_REFRESH_MS);
+}
+
+export function useSession(id: string) {
+  return useAsync<AgentSession | undefined>(() => api.getSession(id));
 }
 
 export function useActivities() {
   return useAsync<Activity[]>(api.getActivities, MEDIUM_REFRESH_MS);
 }
 
-export function useResearch() {
-  return useAsync<ResearchItem[]>(api.getResearch);
+export function useResearchProjects() {
+  return useAsync<ResearchProject[]>(api.getResearchProjects, MEDIUM_REFRESH_MS);
+}
+
+export function useResearchProject(id: string) {
+  return useAsync<ResearchProject | undefined>(() => api.getResearchProject(id));
+}
+
+export function usePapers() {
+  return useAsync<Paper[]>(api.getPapers, MEDIUM_REFRESH_MS);
+}
+
+export function usePaper(id: string) {
+  return useAsync<Paper | undefined>(() => api.getPaper(id));
+}
+
+export function useDatasets() {
+  return useAsync<Dataset[]>(api.getDatasets, MEDIUM_REFRESH_MS);
+}
+
+export function useDataset(id: string) {
+  return useAsync<Dataset | undefined>(() => api.getDataset(id));
+}
+
+export function useExperiments() {
+  return useAsync<Experiment[]>(api.getExperiments, MEDIUM_REFRESH_MS);
+}
+
+export function useExperiment(id: string) {
+  return useAsync<Experiment | undefined>(() => api.getExperiment(id));
+}
+
+export function useResearchReports() {
+  return useAsync<ResearchReport[]>(api.getResearchReports, MEDIUM_REFRESH_MS);
+}
+
+export function useResearchReport(id: string) {
+  return useAsync<ResearchReport | undefined>(() => api.getResearchReport(id));
+}
+
+export function useResearchNotes() {
+  return useAsync<ResearchNote[]>(api.getResearchNotes, MEDIUM_REFRESH_MS);
+}
+
+export function useResearchNote(id: string) {
+  return useAsync<ResearchNote | undefined>(() => api.getResearchNote(id));
+}
+
+/** Fetcher for the dynamic /research/[type] list routes (plain function, no hooks). */
+async function fetchResearchListByType(type: ResearchTypeKey): Promise<ResearchEntity[]> {
+  switch (type) {
+    case "projects":
+      return api.getResearchProjects();
+    case "papers":
+      return api.getPapers();
+    case "datasets":
+      return api.getDatasets();
+    case "experiments":
+      return api.getExperiments();
+    case "reports":
+      return api.getResearchReports();
+    case "notes":
+      return api.getResearchNotes();
+  }
+}
+
+/** Fetcher for the dynamic /research/[type]/[id] detail routes. */
+async function fetchResearchDetailByType(
+  type: ResearchTypeKey,
+  id: string,
+): Promise<ResearchEntity | undefined> {
+  switch (type) {
+    case "projects":
+      return api.getResearchProject(id);
+    case "papers":
+      return api.getPaper(id);
+    case "datasets":
+      return api.getDataset(id);
+    case "experiments":
+      return api.getExperiment(id);
+    case "reports":
+      return api.getResearchReport(id);
+    case "notes":
+      return api.getResearchNote(id);
+  }
+}
+
+/** Composite hooks for the dynamic /research/[type] routes. */
+export function useResearchList(type: ResearchTypeKey): AsyncState<ResearchEntity[]> {
+  return useAsync(() => fetchResearchListByType(type), MEDIUM_REFRESH_MS);
+}
+
+export function useResearchDetail(
+  type: ResearchTypeKey,
+  id: string,
+): AsyncState<ResearchEntity | undefined> {
+  return useAsync(() => fetchResearchDetailByType(type, id));
 }
 
 export function useRobots() {

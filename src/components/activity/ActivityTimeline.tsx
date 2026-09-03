@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { StatusDot } from "@/components/ui/StatusDot";
 import { activityTone, titleCase } from "@/lib/status";
 import { formatClock } from "@/lib/format";
@@ -8,6 +10,17 @@ import type { Activity } from "@/types";
 
 interface ActivityTimelineProps {
   activities: Activity[];
+}
+
+function AssocChip({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="rounded-full border border-border-soft bg-surface-2 px-2 py-0.5 font-mono text-[11px] text-text-secondary transition-colors hover:text-accent"
+    >
+      {label}
+    </Link>
+  );
 }
 
 export function ActivityTimeline({ activities }: ActivityTimelineProps) {
@@ -49,6 +62,37 @@ export function ActivityTimeline({ activities }: ActivityTimelineProps) {
                 <p className="mt-0.5 text-[12px] text-text-muted">
                   {activity.detail}
                 </p>
+              )}
+              {(activity.researchProjectId ||
+                activity.projectId ||
+                activity.agentId ||
+                activity.sessionId) && (
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {activity.researchProjectId && (
+                    <AssocChip
+                      href={`/research/projects/${activity.researchProjectId}`}
+                      label={`research:${activity.researchProjectId}`}
+                    />
+                  )}
+                  {activity.projectId && (
+                    <AssocChip
+                      href={`/projects/${activity.projectId}`}
+                      label={`project:${activity.projectId}`}
+                    />
+                  )}
+                  {activity.agentId && (
+                    <AssocChip
+                      href={`/agents/${activity.agentId}`}
+                      label={`agent:${activity.agentId}`}
+                    />
+                  )}
+                  {activity.sessionId && (
+                    <AssocChip
+                      href={`/sessions/${activity.sessionId}`}
+                      label={`session:${activity.sessionId}`}
+                    />
+                  )}
+                </div>
               )}
             </div>
           </li>

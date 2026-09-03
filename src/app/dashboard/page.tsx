@@ -102,6 +102,13 @@ export default function DashboardPage() {
   const dockerRunning = dockerServices.filter((s) => s.status === "running").length;
   const dockerStopped = dockerServices.length - dockerRunning;
 
+  const agentRegistered = (agents ?? []).length;
+  const agentRunning = (agents ?? []).filter((a) => a.status === "running").length;
+  const agentIdle = (agents ?? []).filter((a) => a.status === "idle").length;
+  const agentOffline = (agents ?? []).filter((a) => a.status === "offline").length;
+  const agentError = (agents ?? []).filter((a) => a.status === "error").length;
+  const agentUnknown = (agents ?? []).filter((a) => a.status === "unknown").length;
+
   return (
     <div className="space-y-4 animate-fade-in">
       <PageHeader
@@ -198,7 +205,33 @@ export default function DashboardPage() {
             title={t("section.agents", "Agents")}
             action={<ViewAllLink href="/agents" />}
           />
-          {agents && <AgentList agents={agents} />}
+          <div className="flex flex-wrap gap-x-4 gap-y-1 px-5 pb-3 text-[12px] text-text-muted">
+            <span>
+              {t("agent.registered", "Registered")}:{" "}
+              <b className="font-semibold text-text-primary">{agentRegistered}</b>
+            </span>
+            <span>
+              {t("status.running", "Running")}:{" "}
+              <b className="font-semibold text-text-primary">{agentRunning}</b>
+            </span>
+            <span>
+              {t("status.idle", "Idle")}:{" "}
+              <b className="font-semibold text-text-primary">{agentIdle}</b>
+            </span>
+            <span>
+              {t("status.offline", "Offline")}:{" "}
+              <b className="font-semibold text-text-primary">{agentOffline}</b>
+            </span>
+            <span>
+              {t("status.error", "Error")}:{" "}
+              <b className="font-semibold text-text-primary">{agentError}</b>
+            </span>
+            <span>
+              {t("status.unknown", "Unknown")}:{" "}
+              <b className="font-semibold text-text-primary">{agentUnknown}</b>
+            </span>
+          </div>
+          {agents && <AgentList agents={agents.slice(0, 5)} />}
         </Card>
       </div>
 

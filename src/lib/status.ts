@@ -5,9 +5,14 @@ import type {
   ProjectActivity,
   ProjectHealth,
   ProjectStatus,
-  ResearchStatus,
+  DatasetStatus,
+  PaperStatus,
+  ResearchExperimentStatus,
+  ResearchProjectStatus,
+  ResearchReportStatus,
   RobotStatus,
   ServiceStatus,
+  SessionStatus,
   TrainingStatus,
   WorkingTree,
 } from "@/types";
@@ -63,11 +68,19 @@ const serviceTone: Record<ServiceStatus, StatusTone> = {
 };
 
 const agentTone: Record<AgentStatus, StatusTone> = {
+  offline: "error",
   idle: "neutral",
   running: "info",
   error: "error",
-  paused: "warning",
-  offline: "error",
+  unknown: "neutral",
+};
+
+const sessionTone: Record<SessionStatus, StatusTone> = {
+  created: "neutral",
+  running: "info",
+  completed: "success",
+  failed: "error",
+  cancelled: "neutral",
 };
 
 const projectStatusTone: Record<ProjectStatus, StatusTone> = {
@@ -112,8 +125,35 @@ const trainingTone: Record<TrainingStatus, StatusTone> = {
   failed: "error",
 };
 
-const researchTone: Record<ResearchStatus, StatusTone> = {
+const researchProjectTone: Record<ResearchProjectStatus, StatusTone> = {
   active: "info",
+  paused: "warning",
+  completed: "success",
+  archived: "neutral",
+};
+
+const paperTone: Record<PaperStatus, StatusTone> = {
+  unread: "neutral",
+  reading: "info",
+  read: "success",
+  archived: "neutral",
+};
+
+const datasetTone: Record<DatasetStatus, StatusTone> = {
+  available: "success",
+  missing: "error",
+  archived: "neutral",
+};
+
+const experimentTone: Record<ResearchExperimentStatus, StatusTone> = {
+  planned: "neutral",
+  running: "info",
+  completed: "success",
+  failed: "error",
+  cancelled: "warning",
+};
+
+const researchReportTone: Record<ResearchReportStatus, StatusTone> = {
   draft: "warning",
   completed: "success",
   archived: "neutral",
@@ -142,6 +182,10 @@ export function agentStatus(status: AgentStatus): StatusVisual {
   return viz(agentTone[status], status);
 }
 
+export function sessionStatus(status: SessionStatus): StatusVisual {
+  return viz(sessionTone[status], status);
+}
+
 export function projectStatus(status: ProjectStatus): StatusVisual {
   return viz(projectStatusTone[status], status);
 }
@@ -166,8 +210,24 @@ export function trainingStatus(status: TrainingStatus): StatusVisual {
   return viz(trainingTone[status], status);
 }
 
-export function researchStatus(status: ResearchStatus): StatusVisual {
-  return viz(researchTone[status], status);
+export function researchProjectStatus(status: ResearchProjectStatus): StatusVisual {
+  return viz(researchProjectTone[status], status);
+}
+
+export function paperStatus(status: PaperStatus): StatusVisual {
+  return viz(paperTone[status], status);
+}
+
+export function datasetStatus(status: DatasetStatus): StatusVisual {
+  return viz(datasetTone[status], status);
+}
+
+export function experimentStatus(status: ResearchExperimentStatus): StatusVisual {
+  return viz(experimentTone[status], status);
+}
+
+export function researchReportStatus(status: ResearchReportStatus): StatusVisual {
+  return viz(researchReportTone[status], status);
 }
 
 /** Human-first title casing for status labels ("online" → "Online"). */

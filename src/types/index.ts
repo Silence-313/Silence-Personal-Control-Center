@@ -166,19 +166,50 @@ export interface Project {
 /* Agents                                                              */
 /* ------------------------------------------------------------------ */
 
-export type AgentStatus = "idle" | "running" | "error" | "paused" | "offline";
+export type AgentStatus = "offline" | "idle" | "running" | "error" | "unknown";
+
+export type AgentType =
+  | "coding"
+  | "research"
+  | "robotics"
+  | "data"
+  | "review"
+  | "general";
 
 export interface Agent {
   id: string;
   name: string;
-  role: string;
+  type: AgentType;
+  description: string;
   status: AgentStatus;
-  currentTask?: string;
-  lastSession: string;
-  lastActivity: string;
   nodeId: string;
-  model?: string;
-  progressPct?: number;
+  currentProjectId?: string | null;
+  currentSessionId?: string | null;
+  currentTask?: string | null;
+  lastActivityAt?: string | null; // ISO 8601
+  capabilities: string[];
+  metadata: Record<string, unknown>;
+}
+
+export type SessionStatus =
+  | "created"
+  | "running"
+  | "completed"
+  | "failed"
+  | "cancelled";
+
+export interface AgentSession {
+  id: string;
+  agentId: string;
+  nodeId: string;
+  projectId?: string | null;
+  // Phase 8: links the Session Plane to a Research Project (Phase 7).
+  researchProjectId?: string | null;
+  status: SessionStatus;
+  startedAt: string; // ISO 8601
+  endedAt?: string | null;
+  lastActivityAt: string; // ISO 8601
+  currentTask?: string | null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -204,6 +235,13 @@ export interface Activity {
   message: string;
   detail?: string;
   nodeId?: string;
+  // Reserved association contract (Phase 6). Null for legacy records; the
+  // backend does not persist these until Phase 7.
+  projectId?: string | null;
+  agentId?: string | null;
+  sessionId?: string | null;
+  // Phase 8: links the Activity spine to a Research Project (Phase 7).
+  researchProjectId?: string | null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -246,25 +284,117 @@ export interface StorageOverview {
 /* Research                                                            */
 /* ------------------------------------------------------------------ */
 
-export type ResearchType =
-  | "papers"
-  | "projects"
-  | "experiments"
-  | "notes"
-  | "datasets"
-  | "reports";
+export type ResearchProjectStatus = "active" | "paused" | "completed" | "archived";
 
-export type ResearchStatus = "active" | "draft" | "completed" | "archived";
+export type PaperStatus = "unread" | "reading" | "read" | "archived";
 
-export interface ResearchItem {
+export type DatasetStatus = "available" | "missing" | "archived";
+
+export type ResearchExperimentStatus =
+  | "planned"
+  | "running"
+  | "completed"
+  | "failed"
+  | "cancelled";
+
+export type ResearchReportFormat = "markdown" | "pdf" | "html" | "other";
+
+export type ResearchReportStatus = "draft" | "completed" | "archived";
+
+export interface ResearchProject {
   id: string;
-  type: ResearchType;
+  name: string;
+  description: string;
+  status: ResearchProjectStatus;
+  createdAt: string; // ISO 8601
+  updatedAt: string; // ISO 8601
+  projectId?: string | null; // optional Phase 5 code-project id
+  repositoryPath?: string | null;
+  tags: string[];
+  metadata: Record<string, unknown>;
+}
+
+export interface ResearchRuntime {
+  exists: boolean;
+  missing: boolean;
+  sizeBytes?: number | null;
+  modifiedAt?: string | null; // ISO 8601
+  error?: string | null;
+}
+
+export interface Paper {
+  id: string;
   title: string;
-  summary?: string;
-  tags?: string[];
-  updatedAt: string;
-  status: ResearchStatus;
-  projectId?: string;
+  authors: string[];
+  year?: number | null;
+  venue?: string | null;
+  doi?: string | null;
+  url?: string | null;
+  pdfPath?: string | null;
+  status: PaperStatus;
+  tags: string[];
+  notes?: string | null;
+  researchProjectId?: string | null;
+  createdAt: string; // ISO 8601
+  updatedAt: string; // ISO 8601
+  runtime?: ResearchRuntime | null; // Phase 8 observation
+}
+
+export interface Dataset {
+  id: string;
+  name: string;
+  description?: string | null;
+  path?: string | null;
+  sizeBytes?: number | null;
+  format?: string | null;
+  source?: string | null;
+  version?: string | null;
+  status: DatasetStatus;
+  researchProjectId?: string | null;
+  createdAt: string; // ISO 8601
+  updatedAt: string; // ISO 8601
+  runtime?: ResearchRuntime | null; // Phase 8 observation
+}
+
+export interface Experiment {
+  id: string;
+  name: string;
+  description?: string | null;
+  researchProjectId?: string | null;
+  status: ResearchExperimentStatus;
+  startedAt?: string | null;
+  endedAt?: string | null;
+  datasetId?: string | null;
+  command?: string | null;
+  result?: string | null;
+  metrics?: Record<string, unknown> | null;
+  artifactPath?: string | null;
+  createdAt: string; // ISO 8601
+  updatedAt: string; // ISO 8601
+  runtime?: ResearchRuntime | null; // Phase 8 observation
+}
+
+export interface ResearchReport {
+  id: string;
+  title: string;
+  description?: string | null;
+  path?: string | null;
+  format: ResearchReportFormat;
+  researchProjectId?: string | null;
+  status: ResearchReportStatus;
+  createdAt: string; // ISO 8601
+  updatedAt: string; // ISO 8601
+  runtime?: ResearchRuntime | null; // Phase 8 observation
+}
+
+export interface ResearchNote {
+  id: string;
+  title: string;
+  content?: string | null;
+  researchProjectId?: string | null;
+  tags: string[];
+  createdAt: string; // ISO 8601
+  updatedAt: string; // ISO 8601
 }
 
 /* ------------------------------------------------------------------ */

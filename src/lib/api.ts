@@ -1,11 +1,17 @@
 import type {
   Activity,
   Agent,
+  AgentSession,
   Command,
+  Dataset,
+  Experiment,
   Node,
+  Paper,
   PowerStatus,
   Project,
-  ResearchItem,
+  ResearchNote,
+  ResearchProject,
+  ResearchReport,
   Robot,
   RoboticsExperiment,
   Service,
@@ -18,11 +24,19 @@ import type {
 import * as backend from "@/lib/backend";
 
 import { activities } from "@/mock/activities";
+import { agentSessions } from "@/mock/agent-sessions";
 import { agents } from "@/mock/agents";
 import { metrics } from "@/mock/metrics";
 import { nodes } from "@/mock/nodes";
 import { projects } from "@/mock/projects";
-import { researchItems } from "@/mock/research";
+import {
+  datasets,
+  experiments as researchExperiments,
+  papers,
+  researchNotes,
+  researchProjects,
+  researchReports,
+} from "@/mock/research";
 import { experiments, robots, trainingRuns } from "@/mock/robotics";
 import { services } from "@/mock/services";
 import { storage } from "@/mock/storage";
@@ -71,13 +85,30 @@ export function getProject(id: string): Promise<Project | undefined> {
     : backend.fetchProject(id);
 }
 
-/* Agents (mock-only until Phase 4) -------------------------------------- */
+/* Agents ------------------------------------------------------------------ */
 export function getAgents(): Promise<Agent[]> {
-  return latency(agents);
+  return USE_MOCK ? latency(agents) : backend.fetchAgents();
 }
 
 export function getAgent(id: string): Promise<Agent | undefined> {
-  return latency(agents.find((a) => a.id === id));
+  return USE_MOCK ? latency(agents.find((a) => a.id === id)) : backend.fetchAgent(id);
+}
+
+export function getAgentSessions(id: string): Promise<AgentSession[]> {
+  return USE_MOCK
+    ? latency(agentSessions.filter((s) => s.agentId === id))
+    : backend.fetchAgentSessions(id);
+}
+
+/* Session Plane (Phase 8) ------------------------------------------------- */
+export function getSessions(): Promise<AgentSession[]> {
+  return USE_MOCK ? latency(agentSessions) : backend.fetchSessions();
+}
+
+export function getSession(id: string): Promise<AgentSession | undefined> {
+  return USE_MOCK
+    ? latency(agentSessions.find((s) => s.id === id))
+    : backend.fetchSession(id);
 }
 
 /* Activity --------------------------------------------------------------- */
@@ -85,9 +116,61 @@ export function getActivities(): Promise<Activity[]> {
   return USE_MOCK ? latency(activities) : backend.fetchActivities();
 }
 
-/* Research (mock-only until Phase 4+) ------------------------------------ */
-export function getResearch(): Promise<ResearchItem[]> {
-  return latency(researchItems);
+/* Research ---------------------------------------------------------------- */
+export function getResearchProjects(): Promise<ResearchProject[]> {
+  return USE_MOCK ? latency(researchProjects) : backend.fetchResearchProjects();
+}
+
+export function getResearchProject(id: string): Promise<ResearchProject | undefined> {
+  return USE_MOCK
+    ? latency(researchProjects.find((p) => p.id === id))
+    : backend.fetchResearchProject(id);
+}
+
+export function getPapers(): Promise<Paper[]> {
+  return USE_MOCK ? latency(papers) : backend.fetchPapers();
+}
+
+export function getPaper(id: string): Promise<Paper | undefined> {
+  return USE_MOCK ? latency(papers.find((p) => p.id === id)) : backend.fetchPaper(id);
+}
+
+export function getDatasets(): Promise<Dataset[]> {
+  return USE_MOCK ? latency(datasets) : backend.fetchDatasets();
+}
+
+export function getDataset(id: string): Promise<Dataset | undefined> {
+  return USE_MOCK ? latency(datasets.find((d) => d.id === id)) : backend.fetchDataset(id);
+}
+
+export function getExperiments(): Promise<Experiment[]> {
+  return USE_MOCK ? latency(researchExperiments) : backend.fetchExperiments();
+}
+
+export function getExperiment(id: string): Promise<Experiment | undefined> {
+  return USE_MOCK
+    ? latency(researchExperiments.find((e) => e.id === id))
+    : backend.fetchExperiment(id);
+}
+
+export function getResearchReports(): Promise<ResearchReport[]> {
+  return USE_MOCK ? latency(researchReports) : backend.fetchResearchReports();
+}
+
+export function getResearchReport(id: string): Promise<ResearchReport | undefined> {
+  return USE_MOCK
+    ? latency(researchReports.find((r) => r.id === id))
+    : backend.fetchResearchReport(id);
+}
+
+export function getResearchNotes(): Promise<ResearchNote[]> {
+  return USE_MOCK ? latency(researchNotes) : backend.fetchResearchNotes();
+}
+
+export function getResearchNote(id: string): Promise<ResearchNote | undefined> {
+  return USE_MOCK
+    ? latency(researchNotes.find((n) => n.id === id))
+    : backend.fetchResearchNote(id);
 }
 
 /* Robotics (mock-only until Phase 4+) ------------------------------------ */

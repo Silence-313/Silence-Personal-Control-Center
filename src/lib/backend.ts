@@ -12,18 +12,36 @@ import type {
   Activity,
   ActivityLevel,
   ActivitySource,
+  Agent,
+  AgentSession,
+  AgentStatus,
+  AgentType,
   Capability,
   Command,
   CommandStatus,
+  Dataset,
+  DatasetStatus,
+  Experiment,
+  ResearchExperimentStatus,
   Node,
   NodeArchitecture,
   NodePlatform,
   NodeStatus,
+  Paper,
+  PaperStatus,
   PowerStatus,
   PowerState,
   Project,
   ProjectHealth,
+  ResearchNote,
+  ResearchProject,
+  ResearchProjectStatus,
+  ResearchReport,
+  ResearchReportFormat,
+  ResearchReportStatus,
+  ResearchRuntime,
   Service,
+  SessionStatus,
   SystemMetrics,
 } from "@/types";
 
@@ -164,6 +182,130 @@ interface BProject {
   last_commit_time: string | null;
 }
 
+interface BAgent {
+  id: string;
+  name: string;
+  type?: string;
+  description: string;
+  status?: string;
+  node_id: string;
+  current_project_id: string | null;
+  current_session_id: string | null;
+  current_task: string | null;
+  last_activity_at: string | null;
+  capabilities?: string[];
+  metadata?: Record<string, unknown>;
+}
+
+interface BAgentSession {
+  id: string;
+  agent_id: string;
+  node_id: string;
+  project_id: string | null;
+  research_project_id: string | null;
+  status?: string;
+  started_at: string;
+  ended_at: string | null;
+  last_activity_at: string;
+  current_task: string | null;
+}
+
+interface BResearchProject {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  project_id: string | null;
+  repository_path: string | null;
+  tags: string[];
+  metadata: Record<string, unknown>;
+}
+
+interface BRuntime {
+  exists: boolean;
+  missing: boolean;
+  size_bytes: number | null;
+  modified_at: string | null;
+  error: string | null;
+}
+
+interface BPaper {
+  id: string;
+  title: string;
+  authors: string[];
+  year: number | null;
+  venue: string | null;
+  doi: string | null;
+  url: string | null;
+  pdf_path: string | null;
+  status: string;
+  tags: string[];
+  notes: string | null;
+  research_project_id: string | null;
+  created_at: string;
+  updated_at: string;
+  runtime?: BRuntime | null;
+}
+
+interface BDataset {
+  id: string;
+  name: string;
+  description: string | null;
+  path: string | null;
+  size_bytes: number | null;
+  format: string | null;
+  source: string | null;
+  version: string | null;
+  status: string;
+  research_project_id: string | null;
+  created_at: string;
+  updated_at: string;
+  runtime?: BRuntime | null;
+}
+
+interface BExperiment {
+  id: string;
+  name: string;
+  description: string | null;
+  research_project_id: string | null;
+  status: string;
+  started_at: string | null;
+  ended_at: string | null;
+  dataset_id: string | null;
+  command: string | null;
+  result: string | null;
+  metrics: Record<string, unknown> | null;
+  artifact_path: string | null;
+  created_at: string;
+  updated_at: string;
+  runtime?: BRuntime | null;
+}
+
+interface BResearchReport {
+  id: string;
+  title: string;
+  description: string | null;
+  path: string | null;
+  format: string;
+  research_project_id: string | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  runtime?: BRuntime | null;
+}
+
+interface BResearchNote {
+  id: string;
+  title: string;
+  content: string | null;
+  research_project_id: string | null;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+}
+
 interface BActivity {
   id: string;
   type: string;
@@ -172,6 +314,10 @@ interface BActivity {
   timestamp: string;
   node_id: string | null;
   command_id: string | null;
+  project_id: string | null;
+  agent_id: string | null;
+  session_id: string | null;
+  research_project_id: string | null;
 }
 
 interface BCommand {
@@ -299,6 +445,149 @@ export function mapProject(p: BProject): Project {
   };
 }
 
+export function mapAgent(a: BAgent): Agent {
+  return {
+    id: a.id,
+    name: a.name,
+    type: (a.type ?? "general") as AgentType,
+    description: a.description ?? "",
+    status: (a.status ?? "unknown") as AgentStatus,
+    nodeId: a.node_id ?? "",
+    currentProjectId: a.current_project_id ?? undefined,
+    currentSessionId: a.current_session_id ?? undefined,
+    currentTask: a.current_task ?? undefined,
+    lastActivityAt: a.last_activity_at ?? undefined,
+    capabilities: a.capabilities ?? [],
+    metadata: a.metadata ?? {},
+  };
+}
+
+export function mapAgentSession(s: BAgentSession): AgentSession {
+  return {
+    id: s.id,
+    agentId: s.agent_id,
+    nodeId: s.node_id,
+    projectId: s.project_id ?? undefined,
+    researchProjectId: s.research_project_id ?? undefined,
+    status: (s.status ?? "created") as SessionStatus,
+    startedAt: s.started_at,
+    endedAt: s.ended_at ?? undefined,
+    lastActivityAt: s.last_activity_at,
+    currentTask: s.current_task ?? undefined,
+  };
+}
+
+export function mapResearchProject(p: BResearchProject): ResearchProject {
+  return {
+    id: p.id,
+    name: p.name,
+    description: p.description ?? "",
+    status: (p.status ?? "active") as ResearchProjectStatus,
+    createdAt: p.created_at,
+    updatedAt: p.updated_at,
+    projectId: p.project_id ?? undefined,
+    repositoryPath: p.repository_path ?? undefined,
+    tags: p.tags ?? [],
+    metadata: p.metadata ?? {},
+  };
+}
+
+function mapRuntime(r?: BRuntime | null): ResearchRuntime | undefined {
+  if (!r) return undefined;
+  return {
+    exists: r.exists,
+    missing: r.missing,
+    sizeBytes: r.size_bytes ?? undefined,
+    modifiedAt: r.modified_at ?? undefined,
+    error: r.error ?? undefined,
+  };
+}
+
+export function mapPaper(p: BPaper): Paper {
+  return {
+    id: p.id,
+    title: p.title,
+    authors: p.authors ?? [],
+    year: p.year ?? undefined,
+    venue: p.venue ?? undefined,
+    doi: p.doi ?? undefined,
+    url: p.url ?? undefined,
+    pdfPath: p.pdf_path ?? undefined,
+    status: (p.status ?? "unread") as PaperStatus,
+    tags: p.tags ?? [],
+    notes: p.notes ?? undefined,
+    researchProjectId: p.research_project_id ?? undefined,
+    createdAt: p.created_at,
+    updatedAt: p.updated_at,
+    runtime: mapRuntime(p.runtime),
+  };
+}
+
+export function mapDataset(d: BDataset): Dataset {
+  return {
+    id: d.id,
+    name: d.name,
+    description: d.description ?? undefined,
+    path: d.path ?? undefined,
+    sizeBytes: d.size_bytes ?? undefined,
+    format: d.format ?? undefined,
+    source: d.source ?? undefined,
+    version: d.version ?? undefined,
+    status: (d.status ?? "available") as DatasetStatus,
+    researchProjectId: d.research_project_id ?? undefined,
+    createdAt: d.created_at,
+    updatedAt: d.updated_at,
+    runtime: mapRuntime(d.runtime),
+  };
+}
+
+export function mapExperiment(e: BExperiment): Experiment {
+  return {
+    id: e.id,
+    name: e.name,
+    description: e.description ?? undefined,
+    researchProjectId: e.research_project_id ?? undefined,
+    status: (e.status ?? "planned") as ResearchExperimentStatus,
+    startedAt: e.started_at ?? undefined,
+    endedAt: e.ended_at ?? undefined,
+    datasetId: e.dataset_id ?? undefined,
+    command: e.command ?? undefined,
+    result: e.result ?? undefined,
+    metrics: e.metrics ?? undefined,
+    artifactPath: e.artifact_path ?? undefined,
+    createdAt: e.created_at,
+    updatedAt: e.updated_at,
+    runtime: mapRuntime(e.runtime),
+  };
+}
+
+export function mapResearchReport(r: BResearchReport): ResearchReport {
+  return {
+    id: r.id,
+    title: r.title,
+    description: r.description ?? undefined,
+    path: r.path ?? undefined,
+    format: (r.format ?? "markdown") as ResearchReportFormat,
+    researchProjectId: r.research_project_id ?? undefined,
+    status: (r.status ?? "draft") as ResearchReportStatus,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+    runtime: mapRuntime(r.runtime),
+  };
+}
+
+export function mapResearchNote(n: BResearchNote): ResearchNote {
+  return {
+    id: n.id,
+    title: n.title,
+    content: n.content ?? undefined,
+    researchProjectId: n.research_project_id ?? undefined,
+    tags: n.tags ?? [],
+    createdAt: n.created_at,
+    updatedAt: n.updated_at,
+  };
+}
+
 const SOURCE_MAP: Record<string, ActivitySource> = {
   command: "control",
   docker: "docker",
@@ -325,6 +614,10 @@ export function mapActivity(a: BActivity): Activity {
     message: a.message,
     detail: a.action,
     nodeId: a.node_id ?? undefined,
+    projectId: a.project_id ?? undefined,
+    agentId: a.agent_id ?? undefined,
+    sessionId: a.session_id ?? undefined,
+    researchProjectId: a.research_project_id ?? undefined,
   };
 }
 
@@ -404,6 +697,141 @@ export async function fetchProject(id: string): Promise<Project | undefined> {
   try {
     const project = await request<BProject>(`/api/v1/projects/${encodeURIComponent(id)}`);
     return mapProject(project);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return undefined;
+    throw err;
+  }
+}
+
+export async function fetchAgents(): Promise<Agent[]> {
+  const agents = await request<BAgent[]>("/api/v1/agents");
+  return agents.map(mapAgent);
+}
+
+export async function fetchAgent(id: string): Promise<Agent | undefined> {
+  try {
+    const agent = await request<BAgent>(`/api/v1/agents/${encodeURIComponent(id)}`);
+    return mapAgent(agent);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return undefined;
+    throw err;
+  }
+}
+
+export async function fetchAgentSessions(id: string): Promise<AgentSession[]> {
+  const sessions = await request<BAgentSession[]>(
+    `/api/v1/agents/${encodeURIComponent(id)}/sessions`,
+  );
+  return sessions.map(mapAgentSession);
+}
+
+export async function fetchSessions(): Promise<AgentSession[]> {
+  const sessions = await request<BAgentSession[]>("/api/v1/sessions");
+  return sessions.map(mapAgentSession);
+}
+
+export async function fetchSession(id: string): Promise<AgentSession | undefined> {
+  try {
+    const session = await request<BAgentSession>(
+      `/api/v1/sessions/${encodeURIComponent(id)}`,
+    );
+    return mapAgentSession(session);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return undefined;
+    throw err;
+  }
+}
+
+export async function fetchResearchProjects(): Promise<ResearchProject[]> {
+  const items = await request<BResearchProject[]>("/api/v1/research/projects");
+  return items.map(mapResearchProject);
+}
+
+export async function fetchResearchProject(id: string): Promise<ResearchProject | undefined> {
+  try {
+    const item = await request<BResearchProject>(
+      `/api/v1/research/projects/${encodeURIComponent(id)}`,
+    );
+    return mapResearchProject(item);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return undefined;
+    throw err;
+  }
+}
+
+export async function fetchPapers(): Promise<Paper[]> {
+  const items = await request<BPaper[]>("/api/v1/research/papers");
+  return items.map(mapPaper);
+}
+
+export async function fetchPaper(id: string): Promise<Paper | undefined> {
+  try {
+    const item = await request<BPaper>(`/api/v1/research/papers/${encodeURIComponent(id)}`);
+    return mapPaper(item);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return undefined;
+    throw err;
+  }
+}
+
+export async function fetchDatasets(): Promise<Dataset[]> {
+  const items = await request<BDataset[]>("/api/v1/research/datasets");
+  return items.map(mapDataset);
+}
+
+export async function fetchDataset(id: string): Promise<Dataset | undefined> {
+  try {
+    const item = await request<BDataset>(`/api/v1/research/datasets/${encodeURIComponent(id)}`);
+    return mapDataset(item);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return undefined;
+    throw err;
+  }
+}
+
+export async function fetchExperiments(): Promise<Experiment[]> {
+  const items = await request<BExperiment[]>("/api/v1/research/experiments");
+  return items.map(mapExperiment);
+}
+
+export async function fetchExperiment(id: string): Promise<Experiment | undefined> {
+  try {
+    const item = await request<BExperiment>(
+      `/api/v1/research/experiments/${encodeURIComponent(id)}`,
+    );
+    return mapExperiment(item);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return undefined;
+    throw err;
+  }
+}
+
+export async function fetchResearchReports(): Promise<ResearchReport[]> {
+  const items = await request<BResearchReport[]>("/api/v1/research/reports");
+  return items.map(mapResearchReport);
+}
+
+export async function fetchResearchReport(id: string): Promise<ResearchReport | undefined> {
+  try {
+    const item = await request<BResearchReport>(
+      `/api/v1/research/reports/${encodeURIComponent(id)}`,
+    );
+    return mapResearchReport(item);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return undefined;
+    throw err;
+  }
+}
+
+export async function fetchResearchNotes(): Promise<ResearchNote[]> {
+  const items = await request<BResearchNote[]>("/api/v1/research/notes");
+  return items.map(mapResearchNote);
+}
+
+export async function fetchResearchNote(id: string): Promise<ResearchNote | undefined> {
+  try {
+    const item = await request<BResearchNote>(`/api/v1/research/notes/${encodeURIComponent(id)}`);
+    return mapResearchNote(item);
   } catch (err) {
     if (err instanceof ApiError && err.status === 404) return undefined;
     throw err;
