@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlmodel import Session
 
-from app.api.routes import activities, auth, commands, events, health, metrics, nodes, power, projects, services
+from app.api.routes import activities, agents, auth, commands, events, health, metrics, nodes, power, projects, research, runtime, services, sessions
 from app.core.config import settings
 from app.core.errors import ApiError
 from app.core.logging import configure_logging
@@ -83,7 +83,11 @@ def create_app() -> FastAPI:
     app.include_router(power.router)
     app.include_router(commands.router)
     app.include_router(projects.router)
+    app.include_router(agents.router)
+    app.include_router(research.router)
     app.include_router(activities.router)
+    app.include_router(sessions.router)
+    app.include_router(runtime.router)
     app.include_router(events.router)
 
     # --- uniform error handling (§45) -------------------------------------

@@ -24,6 +24,10 @@ def _to_out(a) -> ActivityOut:
         timestamp=a.timestamp,
         node_id=a.node_id,
         command_id=a.command_id,
+        project_id=a.project_id,
+        agent_id=a.agent_id,
+        session_id=a.session_id,
+        research_project_id=a.research_project_id,
     )
 
 

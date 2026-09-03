@@ -1,0 +1,108 @@
+# Agent registry (control-plane only — identity/capabilities/association).
+# NOTE: this is a read model, NOT an agent runtime. Nothing here is executed.
+
+agents:
+  - id: coding-agent
+    name: Coding Agent
+    type: coding
+    description: Coding task orchestration (read-only observe)
+    status: idle
+    node_id: macbook-pro
+    current_project_id: coding-video
+    current_session_id: null
+    current_task: null
+    last_activity_at: null
+    capabilities:
+      - code_analysis
+      - code_generation
+      - testing
+    metadata: {}
+
+  - id: research-agent
+    name: Research Agent
+    type: research
+    description: Literature & knowledge work (read-only observe)
+    status: idle
+    node_id: macbook-pro
+    current_project_id: second-brain
+    current_session_id: null
+    current_task: null
+    last_activity_at: null
+    capabilities:
+      - paper_analysis
+      - literature_search
+    metadata: {}
+
+  - id: robotics-agent
+    name: Robotics Agent
+    type: robotics
+    description: Simulation & training orbit (read-only observe)
+    status: idle
+    node_id: macbook-pro
+    current_project_id: null
+    current_session_id: null
+    current_task: null
+    last_activity_at: null
+    capabilities:
+      - robotics_analysis
+    metadata: {}
+
+  - id: data-agent
+    name: Data Agent
+    type: data
+    description: Datasets & indexing (read-only observe)
+    status: idle
+    node_id: macbook-pro
+    current_project_id: second-brain
+    current_session_id: null
+    current_task: null
+    last_activity_at: null
+    capabilities:
+      - data_analysis
+    metadata: {}
+
+  - id: review-agent
+    name: Review Agent
+    type: review
+    description: Code & experiment review (read-only observe)
+    status: idle
+    node_id: macbook-pro
+    current_project_id: null
+    current_session_id: null
+    current_task: null
+    last_activity_at: null
+    capabilities:
+      - review
+    metadata: {}
+
+# Demo read-model sessions (historical; no execution implied).
+sessions:
+  - id: coding-agent-session-001
+    agent_id: coding-agent
+    node_id: macbook-pro
+    project_id: coding-video
+    status: completed
+    started_at: "2026-09-03T08:00:00Z"
+    ended_at: "2026-09-03T08:30:00Z"
+    last_activity_at: "2026-09-03T08:30:00Z"
+    current_task: null
+
+  - id: coding-agent-session-002
+    agent_id: coding-agent
+    node_id: macbook-pro
+    project_id: null
+    status: failed
+    started_at: "2026-09-04T10:00:00Z"
+    ended_at: "2026-09-04T10:12:00Z"
+    last_activity_at: "2026-09-04T10:12:00Z"
+    current_task: null
+
+  - id: research-agent-session-001
+    agent_id: research-agent
+    node_id: macbook-pro
+    project_id: second-brain
+    status: completed
+    started_at: "2026-09-02T14:00:00Z"
+    ended_at: "2026-09-02T15:40:00Z"
+    last_activity_at: "2026-09-02T15:40:00Z"
+    current_task: null

@@ -32,6 +32,19 @@ class Settings(BaseSettings):
     # Project registry (user-filled, read-only git monitoring).
     projects_config: str = str(BACKEND_DIR / "config" / "projects.yaml")
 
+    # Agent registry (control-plane read model: identity/capabilities/association).
+    agents_config: str = str(BACKEND_DIR / "config" / "agents.yaml")
+
+    # Research registry (control-plane read model: papers/datasets/experiments/...).
+    research_config: str = str(BACKEND_DIR / "config" / "research.yaml")
+
+    # Phase 8 runtime observation. research_base is the optional root used to
+    # resolve relative path fields in research.yaml (None → relative paths
+    # report missing). research_observe_ttl_seconds is the in-memory TTL for
+    # observation results (ephemeral, never persisted).
+    research_base: str | None = None
+    research_observe_ttl_seconds: int = 30
+
     # Local node identity (single machine in v0.1).
     node_id: str = "macbook-pro"
     node_name: str = "MacBook Pro"

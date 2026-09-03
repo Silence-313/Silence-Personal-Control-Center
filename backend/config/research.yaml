@@ -1,0 +1,505 @@
+# Research registry (control-plane read model — metadata only).
+# Paths and `command` are metadata strings; nothing here is read or executed.
+# `project_id` references backend/config/projects.yaml ids (null when none).
+
+projects:
+  - id: research-g1
+    name: G1 Motion Control
+    description: Reinforcement-learning locomotion policies for the G1 humanoid.
+    status: active
+    created_at: "2026-08-01T10:00:00Z"
+    updated_at: "2026-09-03T09:40:00Z"
+    project_id: null
+    repository_path: null
+    tags: [G1, RL, MuJoCo, locomotion]
+    metadata:
+      demo: true
+
+  - id: research-gvhmr
+    name: GVHMR Motion Reconstruction
+    description: Generalizable human motion capture and reconstruction.
+    status: active
+    created_at: "2026-08-05T10:00:00Z"
+    updated_at: "2026-09-02T16:00:00Z"
+    project_id: null
+    repository_path: null
+    tags: [HMR, CV, generalization]
+    metadata:
+      demo: true
+
+  - id: research-n2
+    name: N2 Locomotion & Retargeting
+    description: Motion retargeting and gait transfer for the N2 robot.
+    status: active
+    created_at: "2026-07-20T10:00:00Z"
+    updated_at: "2026-09-03T08:20:00Z"
+    project_id: null
+    repository_path: null
+    tags: [N2, retargeting, RL]
+    metadata:
+      demo: true
+
+  - id: research-obsidian
+    name: Obsidian Plugin Research
+    description: Research notes and plugin tooling around Obsidian.
+    status: paused
+    created_at: "2026-08-10T10:00:00Z"
+    updated_at: "2026-08-28T11:00:00Z"
+    project_id: obsidian-plugin
+    repository_path: null
+    tags: [plugin, obsidian, notes]
+    metadata:
+      demo: true
+
+  - id: research-knowledge
+    name: Personal Knowledge & Reading
+    description: Reading queue and personal knowledge base.
+    status: completed
+    created_at: "2026-07-15T10:00:00Z"
+    updated_at: "2026-08-25T09:00:00Z"
+    project_id: second-brain
+    repository_path: null
+    tags: [notes, reading, knowledge]
+    metadata:
+      demo: true
+
+  - id: research-video
+    name: Motion Capture Video Pipeline
+    description: Video production and mocap annotation pipeline.
+    status: archived
+    created_at: "2026-07-01T10:00:00Z"
+    updated_at: "2026-08-12T14:00:00Z"
+    project_id: coding-video
+    repository_path: null
+    tags: [video, mocap, annotation]
+    metadata:
+      demo: true
+
+papers:
+  - id: paper-hist-loco
+    title: Learning Agile Locomotion Skills by Imitation
+    authors: [X. B. Peng, E. Coumans, T. Zhang, S. Levine]
+    year: 2020
+    venue: arXiv
+    doi: "10.48550/arXiv.2011.06250"
+    url: "https://arxiv.org/abs/2011.06250"
+    pdf_path: null
+    status: reading
+    tags: [RL, locomotion, imitation]
+    notes: Reference for G1 reward shaping.
+    research_project_id: research-g1
+    created_at: "2026-08-02T10:00:00Z"
+    updated_at: "2026-09-01T15:00:00Z"
+
+  - id: paper-gvhmr
+    title: "Generalizable Human Motion Reconstruction"
+    authors: [Z. Luo, Y. Rong, Y. Xu]
+    year: 2023
+    venue: arXiv
+    doi: "10.48550/arXiv.2310.18025"
+    url: "https://arxiv.org/abs/2310.18025"
+    pdf_path: papers/gvhmr-2023.pdf
+    status: unread
+    tags: [HMR, pose, generalization]
+    notes: null
+    research_project_id: research-gvhmr
+    created_at: "2026-08-06T10:00:00Z"
+    updated_at: "2026-08-06T10:00:00Z"
+
+  - id: paper-retarget
+    title: Deep Motion Retargeting for Humanoid Locomotion
+    authors: [A. Author, B. Author]
+    year: 2024
+    venue: ICRA
+    doi: null
+    url: null
+    pdf_path: null
+    status: read
+    tags: [retargeting, humanoid]
+    notes: Key method compared against for N2.
+    research_project_id: research-n2
+    created_at: "2026-07-22T10:00:00Z"
+    updated_at: "2026-08-30T10:00:00Z"
+
+  - id: paper-mujoco
+    title: "MuJoCo: A physics engine for model-based control"
+    authors: [E. Todorov, T. Erez, Y. Tassa]
+    year: 2012
+    venue: IROS
+    doi: "10.1109/IROS.2012.6386109"
+    url: null
+    pdf_path: null
+    status: read
+    tags: [MuJoCo, simulator]
+    notes: null
+    research_project_id: research-g1
+    created_at: "2026-08-01T10:00:00Z"
+    updated_at: "2026-08-01T10:00:00Z"
+
+  - id: paper-ppo
+    title: Proximal Policy Optimization Algorithms
+    authors: [J. Schulman, F. Wolski, P. Dhariwal, A. Radford, O. Klimov]
+    year: 2017
+    venue: arXiv
+    doi: "10.48550/arXiv.1707.06347"
+    url: "https://arxiv.org/abs/1707.06347"
+    pdf_path: null
+    status: read
+    tags: [RL, PPO]
+    notes: null
+    research_project_id: research-g1
+    created_at: "2026-08-01T11:00:00Z"
+    updated_at: "2026-08-01T11:00:00Z"
+
+  - id: paper-hmr-pose
+    title: End-to-End Recovery of Human Shape and Pose
+    authors: [A. Kanazawa, M. J. Black, D. W. Jacobs, J. Malik]
+    year: 2018
+    venue: CVPR
+    doi: null
+    url: null
+    pdf_path: null
+    status: archived
+    tags: [HMR, CV, pose]
+    notes: Superseded by GVHMR baselines.
+    research_project_id: research-gvhmr
+    created_at: "2026-08-05T11:00:00Z"
+    updated_at: "2026-09-01T09:00:00Z"
+
+  - id: paper-mocap-3d
+    title: Monocular 3D Human Pose Estimation in the Wild
+    authors: [C. Author]
+    year: 2024
+    venue: arXiv
+    doi: null
+    url: null
+    pdf_path: null
+    status: unread
+    tags: [CV, pose, mocap]
+    notes: null
+    research_project_id: research-video
+    created_at: "2026-07-10T10:00:00Z"
+    updated_at: "2026-07-10T10:00:00Z"
+
+  - id: paper-obsidian-notes
+    title: Note-taking Systems for Long-form Research
+    authors: [D. Writer]
+    year: 2023
+    venue: Blog
+    doi: null
+    url: null
+    pdf_path: null
+    status: unread
+    tags: [notes, methodology]
+    notes: null
+    research_project_id: research-knowledge
+    created_at: "2026-07-16T10:00:00Z"
+    updated_at: "2026-07-16T10:00:00Z"
+
+datasets:
+  - id: ds-mocap
+    name: Humanoid Motion Capture Clips
+    description: Retargeted human motion clips for reference-tracking rewards.
+    path: /Volumes/Research/mocap/v3
+    size_bytes: 697932185600
+    format: mocap
+    source: Vicon
+    version: v3
+    status: available
+    research_project_id: research-g1
+    created_at: "2026-08-01T10:00:00Z"
+    updated_at: "2026-08-29T10:00:00Z"
+
+  - id: ds-retarget
+    name: Retargeted Motion Pairs
+    description: Source/target motion pairs for retargeting training.
+    path: /Volumes/Research/mocap/retargeted-v1
+    size_bytes: 137438953472
+    format: npz
+    source: internal
+    version: v1
+    status: available
+    research_project_id: research-n2
+    created_at: "2026-07-21T10:00:00Z"
+    updated_at: "2026-09-01T10:00:00Z"
+
+  - id: ds-eval
+    name: Held-out Evaluation Set
+    description: Withheld clips for zero-shot generalization evaluation.
+    path: null
+    size_bytes: null
+    format: npz
+    source: internal
+    version: v1
+    status: missing
+    research_project_id: research-gvhmr
+    created_at: "2026-08-08T10:00:00Z"
+    updated_at: "2026-08-08T10:00:00Z"
+
+  - id: ds-video
+    name: Video Recording Corpus
+    description: Raw and segmented video for annotation.
+    path: /Volumes/Research/video/corpus
+    size_bytes: 549755813888
+    format: mp4
+    source: field
+    version: v2
+    status: archived
+    research_project_id: research-video
+    created_at: "2026-07-02T10:00:00Z"
+    updated_at: "2026-08-12T10:00:00Z"
+
+  - id: ds-reading
+    name: Reading Corpus
+    description: Local PDF collection for reading queue.
+    path: /Volumes/Research/papers
+    size_bytes: 2147483648
+    format: pdf
+    source: local
+    version: null
+    status: available
+    research_project_id: research-knowledge
+    created_at: "2026-07-15T10:00:00Z"
+    updated_at: "2026-08-25T10:00:00Z"
+
+experiments:
+  - id: exp-g1-reward
+    name: G1 reward weight sweep
+    description: Sweep reward weights for tracking fidelity vs smoothness.
+    research_project_id: research-g1
+    status: completed
+    started_at: "2026-08-20T09:00:00Z"
+    ended_at: "2026-08-21T02:00:00Z"
+    dataset_id: ds-mocap
+    command: "python train.py --env g1 --sweep reward --seeds 3"
+    result: "best tracking reward 0.82 across 3 seeds"
+    metrics:
+      tracking_reward: 0.82
+      smoothness: 0.71
+    artifact_path: null
+    created_at: "2026-08-20T09:00:00Z"
+    updated_at: "2026-08-21T02:00:00Z"
+
+  - id: exp-g1-terrain
+    name: Terrain curriculum
+    description: Progressive terrain difficulty during policy rollout.
+    research_project_id: research-g1
+    status: running
+    started_at: "2026-09-02T12:00:00Z"
+    ended_at: null
+    dataset_id: ds-mocap
+    command: "python train.py --env g1 --terrain"
+    result: null
+    metrics:
+      policy_iter: 42000
+    artifact_path: null
+    created_at: "2026-09-02T12:00:00Z"
+    updated_at: "2026-09-03T09:50:00Z"
+
+  - id: exp-n2-gait
+    name: N2 gait stability ablation
+    description: Early-stopping sensitivity across random seeds.
+    research_project_id: research-n2
+    status: failed
+    started_at: "2026-08-25T10:00:00Z"
+    ended_at: "2026-08-25T15:00:00Z"
+    dataset_id: ds-retarget
+    command: "python train.py --env n2 --ablation gait --seeds 5"
+    result: "diverged at 40k steps for 3/5 seeds"
+    metrics: null
+    artifact_path: null
+    created_at: "2026-08-25T10:00:00Z"
+    updated_at: "2026-08-25T15:00:00Z"
+
+  - id: exp-gvhmr-base
+    name: GVHMR baseline eval
+    description: Reproduce reported metrics on the retargeted set.
+    research_project_id: research-gvhmr
+    status: completed
+    started_at: "2026-08-28T09:00:00Z"
+    ended_at: "2026-08-28T11:00:00Z"
+    dataset_id: ds-retarget
+    command: "python eval.py --ckpt gvhmr-base"
+    result: "reproduced PA-MPJPE 54.2mm"
+    metrics:
+      pa_mpjpe_mm: 54.2
+    artifact_path: null
+    created_at: "2026-08-28T09:00:00Z"
+    updated_at: "2026-08-28T11:00:00Z"
+
+  - id: exp-n2-early
+    name: Early-stopping sensitivity
+    description: Compare patience sweeps on the N2 retargeting task.
+    research_project_id: research-n2
+    status: planned
+    started_at: null
+    ended_at: null
+    dataset_id: ds-retarget
+    command: "python train.py --env n2 --early-stop sweep"
+    result: null
+    metrics: null
+    artifact_path: null
+    created_at: "2026-09-03T09:00:00Z"
+    updated_at: "2026-09-03T09:00:00Z"
+
+  - id: exp-g1-noise
+    name: Observation noise robustness
+    description: Inject actuator noise to harden the learned policy.
+    research_project_id: research-g1
+    status: cancelled
+    started_at: "2026-08-27T10:00:00Z"
+    ended_at: "2026-08-27T10:20:00Z"
+    dataset_id: ds-mocap
+    command: "python train.py --env g1 --noise 0.1"
+    result: null
+    metrics: null
+    artifact_path: null
+    created_at: "2026-08-27T10:00:00Z"
+    updated_at: "2026-08-27T10:20:00Z"
+
+  - id: exp-video-seg
+    name: Video segmentation tune
+    description: Threshold tuning for shot segmentation on the corpus.
+    research_project_id: research-video
+    status: completed
+    started_at: "2026-07-20T10:00:00Z"
+    ended_at: "2026-07-20T13:00:00Z"
+    dataset_id: ds-video
+    command: "python segment.py --threshold sweep"
+    result: "0.94 boundary F1 at threshold 0.35"
+    metrics:
+      boundary_f1: 0.94
+    artifact_path: null
+    created_at: "2026-07-20T10:00:00Z"
+    updated_at: "2026-07-20T13:00:00Z"
+
+  - id: exp-obsidian-sync
+    name: Sync plugin benchmark
+    description: Latency benchmark for the sync plugin prototype.
+    research_project_id: research-obsidian
+    status: failed
+    started_at: "2026-08-19T10:00:00Z"
+    ended_at: "2026-08-19T10:30:00Z"
+    dataset_id: null
+    command: "node benchmark.js --plugin sync-ob"
+    result: "timeout on large vaults"
+    metrics: null
+    artifact_path: null
+    created_at: "2026-08-19T10:00:00Z"
+    updated_at: "2026-08-19T10:30:00Z"
+
+reports:
+  - id: rep-weekly
+    title: Weekly Research Digest
+    description: Weekly summary of experiments and papers.
+    path: reports/weekly-2026-09.md
+    format: markdown
+    research_project_id: research-g1
+    status: draft
+    created_at: "2026-09-03T08:00:00Z"
+    updated_at: "2026-09-03T08:00:00Z"
+
+  - id: rep-mocap
+    title: Mocap Pipeline Report
+    description: End-to-end documentation of the mocap normalization pipeline.
+    path: reports/mocap-pipeline.pdf
+    format: pdf
+    research_project_id: research-g1
+    status: completed
+    created_at: "2026-08-22T10:00:00Z"
+    updated_at: "2026-08-23T10:00:00Z"
+
+  - id: rep-gvhmr-lit
+    title: GVHMR Literature Review
+    description: Survey of human-motion-reconstruction methods.
+    path: reports/gvhmr-lit.md
+    format: markdown
+    research_project_id: research-gvhmr
+    status: completed
+    created_at: "2026-08-29T10:00:00Z"
+    updated_at: "2026-08-30T10:00:00Z"
+
+  - id: rep-video-monthly
+    title: Video Monthly
+    description: Monthly production recap (HTML).
+    path: reports/video-monthly.html
+    format: html
+    research_project_id: research-video
+    status: archived
+    created_at: "2026-08-01T10:00:00Z"
+    updated_at: "2026-08-01T10:00:00Z"
+
+  - id: rep-reading-archive
+    title: Reading Digest Archive
+    description: Compiled reading notes exported for the knowledge base.
+    path: reports/reading-archive.zip
+    format: other
+    research_project_id: research-knowledge
+    status: completed
+    created_at: "2026-08-24T10:00:00Z"
+    updated_at: "2026-08-24T10:00:00Z"
+
+notes:
+  - id: note-reading-list
+    title: Reading list
+    content: Curated reading queue for this week's review.
+    research_project_id: research-knowledge
+    tags: [reading, queue]
+    created_at: "2026-09-01T09:00:00Z"
+    updated_at: "2026-09-03T02:00:00Z"
+
+  - id: note-retarget-ideas
+    title: Retargeting ideas
+    content: Alternatives to nearest-neighbour retargeting for N2.
+    research_project_id: research-n2
+    tags: [retargeting, ideas]
+    created_at: "2026-08-26T10:00:00Z"
+    updated_at: "2026-08-26T10:00:00Z"
+
+  - id: note-g1-hyper
+    title: G1 hyperparameter log
+    content: Reward scale and entropy coefficient experiments.
+    research_project_id: research-g1
+    tags: [G1, hyperparams]
+    created_at: "2026-08-20T10:00:00Z"
+    updated_at: "2026-08-22T10:00:00Z"
+
+  - id: note-gvhmr-arch
+    title: GVHMR architecture notes
+    content: Encoder/decoder design choices to revisit.
+    research_project_id: research-gvhmr
+    tags: [architecture, HMR]
+    created_at: "2026-08-28T10:00:00Z"
+    updated_at: "2026-08-28T10:00:00Z"
+
+  - id: note-dataset-todo
+    title: Dataset cleanup todo
+    content: Deduplicate clips and re-derive v4 norm stats.
+    research_project_id: research-g1
+    tags: [datasets, todo]
+    created_at: "2026-08-30T10:00:00Z"
+    updated_at: "2026-08-30T10:00:00Z"
+
+  - id: note-week-plan
+    title: Weekly plan
+    content: Finish terrain curriculum; review two retargeting papers.
+    research_project_id: research-knowledge
+    tags: [planning]
+    created_at: "2026-09-01T08:00:00Z"
+    updated_at: "2026-09-01T08:00:00Z"
+
+  - id: note-paper-queue
+    title: Paper queue
+    content: GVHMR, retargeting, and two pose-estimation surveys.
+    research_project_id: research-knowledge
+    tags: [reading]
+    created_at: "2026-08-05T10:00:00Z"
+    updated_at: "2026-09-01T10:00:00Z"
+
+  - id: note-repro
+    title: Baseline reproduction notes
+    content: Steps to reproduce the mocap baseline from scratch.
+    research_project_id: research-n2
+    tags: [reproducibility]
+    created_at: "2026-08-27T10:00:00Z"
+    updated_at: "2026-08-27T10:00:00Z"

@@ -3,6 +3,7 @@
 from app.models.command import Activity, Command, CommandStatus
 from app.models.device import Device, Pairing, PairingStatus
 from app.models.node import Node, NodeCapability, NodeStatus
+from app.models.session import SessionRecord
 
 __all__ = [
     "Node",
@@ -11,6 +12,7 @@ __all__ = [
     "Command",
     "CommandStatus",
     "Activity",
+    "SessionRecord",
     "Device",
     "Pairing",
     "PairingStatus",

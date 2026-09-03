@@ -21,6 +21,23 @@ from fastapi.testclient import TestClient  # noqa: E402
 from app.main import app  # noqa: E402
 
 
+@pytest.fixture(scope="session", autouse=True)
+def _bootstrap_session_plane():
+    """Seed the Session Plane exactly once from the real agents.yaml, before
+    any test can monkeypatch the registry path, so HTTP tests observe a
+    deterministic Session Plane regardless of execution order. Idempotent:
+    later init_db() calls skip seeding because the table is non-empty."""
+    from sqlmodel import Session
+
+    from app.db.database import engine, init_db
+    from app.services import session_service
+
+    init_db()
+    with Session(engine) as db_session:
+        session_service.seed_from_registry(db_session)
+    yield
+
+
 @pytest.fixture()
 def client() -> TestClient:
     with TestClient(app, headers={"Authorization": "Bearer test-token"}) as test_client:

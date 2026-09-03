@@ -5,6 +5,7 @@ import logging
 from sqlmodel import Session, SQLModel, create_engine
 
 from app.core.config import DATA_DIR, settings
+from app.db.migrations import migrate
 
 logger = logging.getLogger("silence.backend.db")
 
@@ -31,4 +32,14 @@ def init_db() -> None:
     from app import models  # noqa: F401
 
     SQLModel.metadata.create_all(engine)
+    # Additive, idempotent migrations (Phase 8: Activity association columns).
+    migrate(engine)
+    # Seed the Session Plane from the agents.yaml registry (idempotent: only
+    # when the sessions table is empty; the YAML is never written back).
+    from app.services import session_service
+
+    with Session(engine) as db_session:
+        seeded = session_service.seed_from_registry(db_session)
+    if seeded:
+        logger.info("session plane seeded", extra={"count": seeded})
     logger.info("database initialized", extra={"database_url": settings.database_url})

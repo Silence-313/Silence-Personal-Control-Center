@@ -39,3 +39,10 @@ class Activity(SQLModel, table=True):
     timestamp: datetime = Field(default_factory=datetime.now, index=True)
     node_id: str | None = None
     command_id: str | None = None
+    # Phase 8 association contract. Nullable, persisted via idempotent
+    # migration (app.db.migrations); old rows read back with None. Values are
+    # populated by internal system producers only (Step 5), never free-form.
+    project_id: str | None = None
+    agent_id: str | None = None
+    session_id: str | None = None
+    research_project_id: str | None = None
