@@ -46,32 +46,30 @@
 
 # 2. Current Status
 
-截至当前：
+截至当前（已实现至 Phase 10）：
 
-  Phase      名称                              状态
-  ---------- --------------------------------- -------------
-  Phase 0    Environment & Capability Audit    ✅ Complete
-  Phase 1    System Architecture               ✅ Complete
-  Phase 2    UI / UX Prototype                 ✅ Complete
-  Phase 3    Backend + Node Foundation         ✅ Complete
-  Phase 4    Frontend Integration + Realtime   ✅ Complete
-  Phase 5    Projects Control Plane            ✅ Complete
-  Phase 6    Agent Control Plane               🚧 Next
-  Phase 7    Session & Activity Plane          ⏳ Planned
-  Phase 8    Research Control Plane            ⏳ Planned
-  Phase 9    Robotics Control Plane            ⏳ Planned
-  Phase 10   Personal AI Data Center           ⏳ Planned
-  Phase 11   Execution Plane                   ⏳ Planned
-  Phase 12   Security Hardening                ⏳ Planned
-  Phase 13   Remote Access / Tailscale         ⏳ Planned
-  Phase 14   PWA / iPad Optimization           ⏳ Planned
-  Phase 15   Observability & Monitoring        ⏳ Planned
-  Phase 16   Full Integration / E2E            ⏳ Planned
-  Phase 17   Deployment                        ⏳ Planned
-  Phase 18   Documentation                     ⏳ Planned
+| Phase | 名称 | 状态 |
+|---|---|---|
+| Phase 0 | Environment & Capability Audit | ✅ Complete |
+| Phase 1 | System Architecture | ✅ Complete |
+| Phase 2 | UI / UX Prototype | ✅ Complete |
+| Phase 3 | Backend + Node Foundation | ✅ Complete |
+| Phase 4 | Frontend Integration + Realtime | ✅ Complete |
+| Phase 5 | Projects Control Plane | ✅ Complete |
+| Phase 6 | Agent Control Plane | ✅ Complete |
+| Phase 7 | Research Control Plane | ✅ Complete |
+| Phase 8 | Runtime & Activity (Session) Plane | ✅ Complete |
+| Phase 9 | Knowledge & Automation Plane | ✅ Complete |
+| Phase 10 | Observability & Intelligence Plane | ✅ Complete |
+| 后续 | Execution / Security / Tailscale / PWA / Deployment | ⏳ Planned |
 
-> Phase 数量与边界允许根据实际开发情况调整。README
-> 是当前路线图，而不是不可修改的合同。
+> 说明 1：相比早期路线图，实施顺序做了重排——Research 提前为 Phase 7，
+> Session+Activity 顺延为 Phase 8，Knowledge+Automation 与 Observability 提前插入。
+>
+> 说明 2：Robotics 与 Data Center 目前只有前端界面 + 演示数据（详见
+> `docs/USER_GUIDE.md` §9），真实后端待后续阶段接入。
+>
+> Phase 数量与边界允许根据实际开发情况调整。
 
 ------------------------------------------------------------------------
 
@@ -93,13 +91,14 @@ iPad Safari / PWA
         ▼
    Control Plane
         │
-        ├── Node
+        ├── Node / Metrics / Services / Power
         ├── Projects
-        ├── Agents
-        ├── Sessions
+        ├── Agents / Sessions
         ├── Research
-        ├── Robotics
-        └── Data Center
+        ├── Knowledge / Automation
+        ├── Observability
+        ├── Robotics      (UI + demo data)
+        └── Data Center   (UI + demo data)
         │
         ▼
       Adapters
@@ -166,6 +165,10 @@ WebSocket
 ------------------------------------------------------------------------
 
 # 5. Phase Roadmap
+
+> ⚠️ 本节为最早规划的逐阶段路线图（命名/顺序已被实际实施重排，权威状态见上文
+> §2 表格）。Robotics 与 Data Center 目前仅前端 + 演示数据。
+> 使用指南见 `docs/USER_GUIDE.md`，Phase 10 汇报见 `docs/phase-10-report.md`。
 
 ## Phase 0 --- Environment & Capability Audit
 
@@ -467,7 +470,7 @@ unknown
 
 > **Phase 6 负责"认识 Agent"，Execution Plane 才负责"驱动 Agent"。**
 
-状态：**Next**
+状态：**Complete**
 
 ------------------------------------------------------------------------
 
@@ -788,6 +791,7 @@ Mac
 
 ``` text
 README.md
+docs/USER_GUIDE.md
 ARCHITECTURE.md
 API.md
 DEPLOYMENT.md
@@ -805,7 +809,11 @@ docs/
 ├── phase-3-*
 ├── phase-4-*
 ├── phase-5-*
-└── phase-6-*
+├── phase-6-*
+├── phase-7-*
+├── phase-8-*
+├── phase-9-*
+└── phase-10-*
 ```
 
 ------------------------------------------------------------------------
@@ -965,33 +973,16 @@ Next Phase
 
 # 22. Current Next Step
 
-当前 Phase 5 已完成。
+当前 **Phase 10（Observability & Intelligence Plane）已完成**。
 
-下一步：
+下一步候选（按优先级）：
 
-# Phase 6 --- Agent Control Plane
+1. **Robotics 真实后端接入** —— 目前 `/robotics` 整页为演示数据。
+2. **Data Center 真实存储接入** —— 目前 `/data-center` 整页为演示数据（2TB 数据层）。
+3. **Execution Plane（执行面）** —— 命令 / Docker / Agent 驱动，需严格鉴权、能力权限与审计日志。
+4. **细节打磨** —— 补齐 `docs/USER_GUIDE.md` 中标注「演示数据」的内容（机器人 / 存储 / 任务）。
 
-第一步不是写 Agent。
-
-而是：
-
-``` text
-Audit existing Agent architecture
-        ↓
-Design Agent domain model
-        ↓
-Design Registry
-        ↓
-Design Session read model
-        ↓
-Associate Activity / Project
-        ↓
-Implement read-only Agent Control Plane
-        ↓
-Test
-        ↓
-iPad verification
-```
+详细使用见 `docs/USER_GUIDE.md`；Phase 10 汇报见 `docs/phase-10-report.md`。
 
 ------------------------------------------------------------------------
 

@@ -32,3 +32,6 @@ __pycache__/
 .pytest_cache/
 backend/.venv/
 backend/data/
+
+# stray draft notes
+/docs/1.md
