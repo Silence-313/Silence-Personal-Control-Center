@@ -6,6 +6,7 @@
  * when `NEXT_PUBLIC_USE_MOCK === "false"`.
  */
 
+import { API_BASE } from "@/lib/api-base";
 import { formatUptime } from "@/lib/format";
 import { getAccessToken } from "@/lib/device";
 import type {
@@ -16,13 +17,20 @@ import type {
   AgentSession,
   AgentStatus,
   AgentType,
+  AutomationRuleState,
+  AutomationRun,
   Capability,
   Command,
   CommandStatus,
+  ContextData,
   Dataset,
   DatasetStatus,
   Experiment,
-  ResearchExperimentStatus,
+  HealthSummary,
+  KnowledgeItem,
+  KnowledgeType,
+  MetricSample,
+  MetricsSummary,
   Node,
   NodeArchitecture,
   NodePlatform,
@@ -33,6 +41,9 @@ import type {
   PowerState,
   Project,
   ProjectHealth,
+  Relation,
+  RelationType,
+  ResearchExperimentStatus,
   ResearchNote,
   ResearchProject,
   ResearchProjectStatus,
@@ -45,9 +56,8 @@ import type {
   SystemMetrics,
 } from "@/types";
 
-export const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, "") ??
-  "http://localhost:8000";
+export { API_BASE };
+
 const LOCAL_NODE_ID = process.env.NEXT_PUBLIC_NODE_ID ?? "macbook-pro";
 
 export class ApiError extends Error {
@@ -651,6 +661,113 @@ export function mapPower(b: BPower): PowerStatus {
 
 // ---------------------------------------------------------------- fetchers
 
+// Phase 9 raw shapes (knowledge / context / automation)
+interface BKnowledgeItem {
+  id: string;
+  entity_id: string;
+  type: string;
+  title: string;
+  summary: string;
+  tags: string[];
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+interface BRelation {
+  id: string;
+  source_id: string;
+  target_id: string;
+  relation_type: string;
+  created_at: string;
+}
+
+interface BContext {
+  type: string;
+  id: string;
+  entity: Record<string, unknown>;
+  relations: BRelation[];
+  projects: BProject[];
+  agents: BAgent[];
+  sessions: BAgentSession[];
+  research_projects: BResearchProject[];
+  papers: BPaper[];
+  datasets: BDataset[];
+  experiments: BExperiment[];
+  reports: BResearchReport[];
+  notes: BResearchNote[];
+  activities: BActivity[];
+  generated_at: string;
+}
+
+interface BAutomationRule {
+  id: string;
+  name: string;
+  enabled: boolean;
+  trigger_type: string;
+  trigger_value?: string | null;
+  actions: string[];
+  run_count: number;
+  last_run_at?: string | null;
+}
+
+export function mapKnowledgeItem(i: BKnowledgeItem): KnowledgeItem {
+  return {
+    id: i.id,
+    entityId: i.entity_id,
+    type: i.type as KnowledgeType,
+    title: i.title,
+    summary: i.summary ?? "",
+    tags: i.tags ?? [],
+    metadata: i.metadata ?? {},
+    createdAt: i.created_at,
+    updatedAt: i.updated_at,
+  };
+}
+
+export function mapRelation(r: BRelation): Relation {
+  return {
+    id: r.id,
+    sourceId: r.source_id,
+    targetId: r.target_id,
+    relationType: r.relation_type as RelationType,
+    createdAt: r.created_at,
+  };
+}
+
+export function mapContext(c: BContext): ContextData {
+  return {
+    type: c.type as KnowledgeType,
+    id: c.id,
+    entity: c.entity,
+    relations: (c.relations ?? []).map(mapRelation),
+    projects: (c.projects ?? []).map(mapProject),
+    agents: (c.agents ?? []).map(mapAgent),
+    sessions: (c.sessions ?? []).map(mapAgentSession),
+    researchProjects: (c.research_projects ?? []).map(mapResearchProject),
+    papers: (c.papers ?? []).map(mapPaper),
+    datasets: (c.datasets ?? []).map(mapDataset),
+    experiments: (c.experiments ?? []).map(mapExperiment),
+    reports: (c.reports ?? []).map(mapResearchReport),
+    notes: (c.notes ?? []).map(mapResearchNote),
+    activities: (c.activities ?? []).map(mapActivity),
+    generatedAt: c.generated_at,
+  };
+}
+
+export function mapAutomationRule(r: BAutomationRule): AutomationRuleState {
+  return {
+    id: r.id,
+    name: r.name,
+    enabled: r.enabled,
+    triggerType: r.trigger_type,
+    triggerValue: r.trigger_value ?? undefined,
+    actions: r.actions ?? [],
+    runCount: r.run_count ?? 0,
+    lastRunAt: r.last_run_at ?? undefined,
+  };
+}
+
 let nodeIdPromise: Promise<string> | null = null;
 
 async function resolveNodeId(): Promise<string> {
@@ -871,4 +988,215 @@ export async function sendCommand(input: {
     body: JSON.stringify(payload),
   });
   return mapCommand(command);
+}
+
+// ---------------------------------------------------------------- knowledge
+
+export async function fetchKnowledgeItems(
+  params: { q?: string; type?: string; tag?: string } = {},
+): Promise<KnowledgeItem[]> {
+  const query = new URLSearchParams();
+  if (params.q) query.set("q", params.q);
+  if (params.type) query.set("type", params.type);
+  if (params.tag) query.set("tag", params.tag);
+  const qs = query.toString();
+  const items = await request<BKnowledgeItem[]>(
+    `/api/v1/knowledge${qs ? `?${qs}` : ""}`,
+  );
+  return items.map(mapKnowledgeItem);
+}
+
+export async function fetchKnowledgeItem(id: string): Promise<KnowledgeItem | undefined> {
+  try {
+    const item = await request<BKnowledgeItem>(
+      `/api/v1/knowledge/${encodeURIComponent(id)}`,
+    );
+    return mapKnowledgeItem(item);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return undefined;
+    throw err;
+  }
+}
+
+export async function fetchRelations(id: string): Promise<Relation[]> {
+  const items = await request<BRelation[]>(`/api/v1/relations/${encodeURIComponent(id)}`);
+  return items.map(mapRelation);
+}
+
+export async function fetchContext(
+  type: string,
+  id: string,
+): Promise<ContextData | undefined> {
+  try {
+    const ctx = await request<BContext>(
+      `/api/v1/context/${encodeURIComponent(type)}/${encodeURIComponent(id)}`,
+    );
+    return mapContext(ctx);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return undefined;
+    throw err;
+  }
+}
+
+export async function fetchAutomationRules(): Promise<AutomationRuleState[]> {
+  const items = await request<BAutomationRule[]>("/api/v1/automation/rules");
+  return items.map(mapAutomationRule);
+}
+
+// -------------------------------------------------- Phase 10 raw shapes
+
+interface BMetricSample {
+  id: string;
+  node_id: string;
+  timestamp: string;
+  cpu_percent: number;
+  memory_percent: number;
+  disk_percent: number;
+  network_rx: number;
+  network_tx: number;
+  metadata: Record<string, unknown>;
+}
+
+interface BMetricsSummary {
+  node_id: string;
+  range: string;
+  samples: number;
+  cpu: { average: number; maximum: number };
+  memory: { average: number; maximum: number };
+  disk: { average: number };
+}
+
+interface BHealthSummary {
+  overall_score: number;
+  node_health: { online: number; offline: number };
+  service_health: { docker_daemon: boolean | null; running: number; stopped: number };
+  recent_errors: Array<{
+    id: string;
+    type: string;
+    action: string;
+    message: string;
+    timestamp: string;
+  }>;
+}
+
+interface BAutomationRun {
+  id: string;
+  rule_id: string;
+  trigger: string;
+  status: string;
+  result: Record<string, unknown>;
+  error?: string | null;
+  triggered_at: string;
+}
+
+export function mapMetricSample(s: BMetricSample): MetricSample {
+  return {
+    id: s.id,
+    nodeId: s.node_id,
+    timestamp: s.timestamp,
+    cpuPercent: s.cpu_percent,
+    memoryPercent: s.memory_percent,
+    diskPercent: s.disk_percent,
+    networkRx: s.network_rx,
+    networkTx: s.network_tx,
+    metadata: s.metadata ?? {},
+  };
+}
+
+export function mapMetricsSummary(s: BMetricsSummary): MetricsSummary {
+  return {
+    nodeId: s.node_id,
+    range: s.range as MetricsSummary["range"],
+    samples: s.samples,
+    cpu: { average: s.cpu.average, maximum: s.cpu.maximum },
+    memory: { average: s.memory.average, maximum: s.memory.maximum },
+    disk: { average: s.disk.average },
+  };
+}
+
+export function mapHealthSummary(h: BHealthSummary): HealthSummary {
+  return {
+    overallScore: h.overall_score,
+    nodeHealth: { online: h.node_health.online, offline: h.node_health.offline },
+    serviceHealth: {
+      dockerDaemon: h.service_health.docker_daemon,
+      running: h.service_health.running,
+      stopped: h.service_health.stopped,
+    },
+    recentErrors: (h.recent_errors ?? []).map((e) => ({
+      id: e.id,
+      type: e.type,
+      action: e.action,
+      message: e.message,
+      timestamp: e.timestamp,
+    })),
+  };
+}
+
+export function mapAutomationRun(r: BAutomationRun): AutomationRun {
+  return {
+    id: r.id,
+    ruleId: r.rule_id,
+    trigger: r.trigger,
+    status: r.status as AutomationRun["status"],
+    result: r.result ?? {},
+    error: r.error ?? null,
+    triggeredAt: r.triggered_at,
+  };
+}
+
+// -------------------------------------------------- Phase 10 fetchers
+
+export async function fetchMetricsHistory(params?: {
+  nodeId?: string;
+  start?: string;
+  end?: string;
+  limit?: number;
+}): Promise<MetricSample[]> {
+  const nodeId = params?.nodeId ?? (await resolveNodeId());
+  const q = new URLSearchParams({ node_id: nodeId });
+  if (params?.start) q.set("start", params.start);
+  if (params?.end) q.set("end", params.end);
+  if (params?.limit != null) q.set("limit", String(params.limit));
+  const items = await request<BMetricSample[]>(`/api/v1/metrics/history?${q.toString()}`);
+  return items.map(mapMetricSample);
+}
+
+export async function fetchMetricsSummary(params?: {
+  nodeId?: string;
+  range?: string;
+}): Promise<MetricsSummary> {
+  const nodeId = params?.nodeId ?? (await resolveNodeId());
+  const q = new URLSearchParams({ node_id: nodeId, range: params?.range ?? "24h" });
+  const summary = await request<BMetricsSummary>(`/api/v1/metrics/summary?${q.toString()}`);
+  return mapMetricsSummary(summary);
+}
+
+export async function fetchHealthSummary(): Promise<HealthSummary> {
+  const summary = await request<BHealthSummary>("/api/v1/health/summary");
+  return mapHealthSummary(summary);
+}
+
+export async function fetchEventTimeline(params?: {
+  severity?: string;
+  category?: string;
+  source?: string;
+  start?: string;
+  end?: string;
+  limit?: number;
+}): Promise<Activity[]> {
+  const q = new URLSearchParams();
+  if (params?.severity) q.set("severity", params.severity);
+  if (params?.category) q.set("category", params.category);
+  if (params?.source) q.set("source", params.source);
+  if (params?.start) q.set("start", params.start);
+  if (params?.end) q.set("end", params.end);
+  if (params?.limit != null) q.set("limit", String(params.limit));
+  const items = await request<BActivity[]>(`/api/v1/events/timeline?${q.toString()}`);
+  return items.map(mapActivity);
+}
+
+export async function fetchAutomationRuns(limit = 50): Promise<AutomationRun[]> {
+  const items = await request<BAutomationRun[]>(`/api/v1/automation/runs?limit=${limit}`);
+  return items.map(mapAutomationRun);
 }

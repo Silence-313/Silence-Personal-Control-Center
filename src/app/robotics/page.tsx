@@ -3,6 +3,7 @@
 import { RobotCard } from "@/components/robotics/RobotCard";
 import { TrainingRunRow } from "@/components/robotics/TrainingRunRow";
 import { Card } from "@/components/ui/Card";
+import { MockDataBadge } from "@/components/ui/MockDataBadge";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SkeletonBlock } from "@/components/ui/Skeleton";
@@ -48,6 +49,7 @@ export default function RoboticsPage() {
           "page.roboticsDesc",
           "Robots, simulations, training runs and experiments — monitoring only in v0.1.",
         )}
+        actions={<MockDataBadge domain="robotics" />}
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

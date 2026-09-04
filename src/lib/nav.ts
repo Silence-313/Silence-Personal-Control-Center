@@ -6,6 +6,8 @@ import {
   FlaskConical,
   FolderGit2,
   LayoutDashboard,
+  Library,
+  LineChart,
   List,
   type LucideIcon,
 } from "lucide-react";
@@ -21,12 +23,14 @@ export interface NavItem {
 
 export const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", key: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/observability", key: "observability", label: "Observability", icon: LineChart },
   { href: "/projects", key: "projects", label: "Projects", icon: FolderGit2 },
   { href: "/agents", key: "agents", label: "Agents", icon: Bot },
   { href: "/sessions", key: "sessions", label: "Sessions", icon: List },
   { href: "/research", key: "research", label: "Research", icon: FlaskConical },
   { href: "/robotics", key: "robotics", label: "Robotics", icon: Cpu },
   { href: "/data-center", key: "dataCenter", label: "Data Center", icon: Database },
+  { href: "/knowledge", key: "knowledge", label: "Knowledge", icon: Library },
   { href: "/activity", key: "activity", label: "Activity", icon: Activity },
 ];
 

@@ -2,13 +2,21 @@ import type {
   Activity,
   Agent,
   AgentSession,
+  AutomationRuleState,
+  AutomationRun,
   Command,
+  ContextData,
   Dataset,
   Experiment,
+  HealthSummary,
+  KnowledgeItem,
+  MetricSample,
+  MetricsSummary,
   Node,
   Paper,
   PowerStatus,
   Project,
+  Relation,
   ResearchNote,
   ResearchProject,
   ResearchReport,
@@ -22,6 +30,7 @@ import type {
 } from "@/types";
 
 import * as backend from "@/lib/backend";
+import { USE_MOCK } from "@/lib/data-source";
 
 import { activities } from "@/mock/activities";
 import { agentSessions } from "@/mock/agent-sessions";
@@ -41,6 +50,13 @@ import { experiments, robots, trainingRuns } from "@/mock/robotics";
 import { services } from "@/mock/services";
 import { storage } from "@/mock/storage";
 import { tasks } from "@/mock/tasks";
+import { automationRules, buildMockContext, knowledgeItems, relations } from "@/mock/knowledge";
+import {
+  automationRuns,
+  healthSummary,
+  metricsHistory,
+  metricsSummary,
+} from "@/mock/observability";
 
 /**
  * API boundary — the seam between mock data (Phase 2) and the FastAPI backend
@@ -49,8 +65,6 @@ import { tasks } from "@/mock/tasks";
  * Set `NEXT_PUBLIC_USE_MOCK=false` to read real data; anything not yet backed
  * by the backend (agents/research/robotics/tasks/storage) keeps mock data.
  */
-
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK !== "false";
 
 const latency = <T>(data: T): Promise<T> =>
   new Promise((resolve) => setTimeout(() => resolve(data), 80));
@@ -171,6 +185,92 @@ export function getResearchNote(id: string): Promise<ResearchNote | undefined> {
   return USE_MOCK
     ? latency(researchNotes.find((n) => n.id === id))
     : backend.fetchResearchNote(id);
+}
+
+/* Knowledge & Automation (Phase 9) ---------------------------------------- */
+export function getKnowledgeItems(params?: {
+  q?: string;
+  type?: string;
+  tag?: string;
+}): Promise<KnowledgeItem[]> {
+  if (!USE_MOCK) return backend.fetchKnowledgeItems(params);
+  let items = knowledgeItems;
+  if (params?.q) {
+    const q = params.q.toLowerCase();
+    items = items.filter(
+      (i) =>
+        i.title.toLowerCase().includes(q) ||
+        i.summary.toLowerCase().includes(q) ||
+        i.tags.some((t) => t.toLowerCase().includes(q)),
+    );
+  }
+  if (params?.type) items = items.filter((i) => i.type === params.type);
+  if (params?.tag) items = items.filter((i) => i.tags.includes(params.tag as string));
+  return latency(items);
+}
+
+export function getKnowledgeItem(id: string): Promise<KnowledgeItem | undefined> {
+  return USE_MOCK
+    ? latency(knowledgeItems.find((i) => i.id === id || i.entityId === id))
+    : backend.fetchKnowledgeItem(id);
+}
+
+export function getRelations(id: string): Promise<Relation[]> {
+  return USE_MOCK
+    ? latency(
+        relations.filter(
+          (r) =>
+            r.sourceId === id ||
+            r.targetId === id ||
+            r.sourceId.endsWith(`:${id}`) ||
+            r.targetId.endsWith(`:${id}`),
+        ),
+      )
+    : backend.fetchRelations(id);
+}
+
+export function getContext(type: string, id: string): Promise<ContextData | undefined> {
+  return USE_MOCK ? latency(buildMockContext(type, id)) : backend.fetchContext(type, id);
+}
+
+export function getAutomationRules(): Promise<AutomationRuleState[]> {
+  return USE_MOCK ? latency(automationRules) : backend.fetchAutomationRules();
+}
+
+/* Observability (Phase 10) ------------------------------------------------ */
+export function getMetricsHistory(params?: {
+  nodeId?: string;
+  start?: string;
+  end?: string;
+  limit?: number;
+}): Promise<MetricSample[]> {
+  return USE_MOCK ? latency(metricsHistory) : backend.fetchMetricsHistory(params);
+}
+
+export function getMetricsSummary(params?: {
+  nodeId?: string;
+  range?: string;
+}): Promise<MetricsSummary> {
+  return USE_MOCK ? latency(metricsSummary) : backend.fetchMetricsSummary(params);
+}
+
+export function getHealthSummary(): Promise<HealthSummary> {
+  return USE_MOCK ? latency(healthSummary) : backend.fetchHealthSummary();
+}
+
+export function getEventTimeline(params?: {
+  severity?: string;
+  category?: string;
+  source?: string;
+  start?: string;
+  end?: string;
+  limit?: number;
+}): Promise<Activity[]> {
+  return USE_MOCK ? latency(activities) : backend.fetchEventTimeline(params);
+}
+
+export function getAutomationRuns(): Promise<AutomationRun[]> {
+  return USE_MOCK ? latency(automationRuns) : backend.fetchAutomationRuns();
 }
 
 /* Robotics (mock-only until Phase 4+) ------------------------------------ */

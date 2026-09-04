@@ -8,9 +8,16 @@ import type {
   Activity,
   Agent,
   AgentSession,
+  AutomationRuleState,
+  AutomationRun,
   Command,
+  ContextData,
   Dataset,
   Experiment,
+  HealthSummary,
+  KnowledgeItem,
+  MetricSample,
+  MetricsSummary,
   Node,
   Paper,
   PowerStatus,
@@ -268,6 +275,54 @@ export function useTasks() {
 
 export function usePower(nodeId: string) {
   return useAsync<PowerStatus>(() => api.getPower(nodeId), MEDIUM_REFRESH_MS);
+}
+
+export function useKnowledgeItems(params?: {
+  q?: string;
+  type?: string;
+  tag?: string;
+}) {
+  return useAsync<KnowledgeItem[]>(() => api.getKnowledgeItems(params), MEDIUM_REFRESH_MS);
+}
+
+/** Aggregated context for one entity (knowledge graph neighbourhood). */
+export function useContextData(type: string, id: string) {
+  return useAsync<ContextData | undefined>(() => api.getContext(type, id));
+}
+
+export function useAutomationRules() {
+  return useAsync<AutomationRuleState[]>(api.getAutomationRules, MEDIUM_REFRESH_MS);
+}
+
+/* Observability (Phase 10) ------------------------------------------------ */
+export function useMetricsHistory(params?: {
+  nodeId?: string;
+  start?: string;
+  end?: string;
+  limit?: number;
+}) {
+  return useAsync<MetricSample[]>(() => api.getMetricsHistory(params), MEDIUM_REFRESH_MS);
+}
+
+export function useMetricsSummary(params?: { nodeId?: string; range?: string }) {
+  return useAsync<MetricsSummary>(() => api.getMetricsSummary(params), MEDIUM_REFRESH_MS);
+}
+
+export function useHealthSummary() {
+  return useAsync<HealthSummary>(api.getHealthSummary, MEDIUM_REFRESH_MS);
+}
+
+export function useEventTimeline(params?: {
+  severity?: string;
+  category?: string;
+  source?: string;
+  limit?: number;
+}) {
+  return useAsync<Activity[]>(() => api.getEventTimeline(params), MEDIUM_REFRESH_MS);
+}
+
+export function useAutomationRuns() {
+  return useAsync<AutomationRun[]>(api.getAutomationRuns, MEDIUM_REFRESH_MS);
 }
 
 /** Queue a command (mock action) and return the resulting Command object. */

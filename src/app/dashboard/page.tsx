@@ -11,6 +11,7 @@ import { ProjectList } from "@/components/project/ProjectList";
 import { DockerStatusCard } from "@/components/service/DockerStatusCard";
 import { TaskList } from "@/components/task/TaskList";
 import { Card } from "@/components/ui/Card";
+import { MockDataBadge } from "@/components/ui/MockDataBadge";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SkeletonBlock } from "@/components/ui/Skeleton";
@@ -245,7 +246,10 @@ export default function DashboardPage() {
           />
         </div>
         <Card className="lg:col-span-7">
-          <SectionHeading title={t("section.currentTasks", "Current Tasks")} />
+          <SectionHeading
+            title={t("section.currentTasks", "Current Tasks")}
+            action={<MockDataBadge domain="tasks" />}
+          />
           {tasks && <TaskList tasks={tasks} />}
         </Card>
       </div>

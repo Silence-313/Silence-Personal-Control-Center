@@ -1,9 +1,17 @@
 "use client";
 
+import { USE_MOCK } from "@/lib/data-source";
 import { useI18n } from "@/lib/i18n";
 
+/**
+ * Global "whole app is demo" banner pill, shown only in full mock mode.
+ * (When the backend is enabled, individual mock-only sections carry their own
+ * `MockDataBadge` instead.)
+ */
 export function DemoBadge() {
   const { t } = useI18n();
+
+  if (!USE_MOCK) return null;
 
   return (
     <span

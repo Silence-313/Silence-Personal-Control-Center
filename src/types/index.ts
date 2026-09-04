@@ -452,3 +452,151 @@ export interface Task {
   progressPct: number;
   detail?: string;
 }
+
+/* ------------------------------------------------------------------ */
+/* Knowledge & Automation (Phase 9)                                    */
+/* ------------------------------------------------------------------ */
+
+export type KnowledgeType =
+  | "project"
+  | "agent"
+  | "research"
+  | "paper"
+  | "dataset"
+  | "experiment"
+  | "report"
+  | "note"
+  | "session"
+  | "activity";
+
+export type RelationType =
+  | "belongs_to"
+  | "uses"
+  | "generated_by"
+  | "depends_on"
+  | "references"
+  | "derived_from";
+
+export interface KnowledgeItem {
+  /** Namespaced id ("paper:paper-gvhmr"). */
+  id: string;
+  /** Raw entity id, "paper-gvhmr" after stripping the namespace prefix. */
+  entityId: string;
+  type: KnowledgeType;
+  title: string;
+  summary: string;
+  tags: string[];
+  metadata: Record<string, unknown>;
+  createdAt: string; // ISO 8601
+  updatedAt: string; // ISO 8601
+}
+
+export interface Relation {
+  id: string;
+  sourceId: string; // namespaced
+  targetId: string; // namespaced
+  relationType: RelationType;
+  createdAt: string; // ISO 8601
+}
+
+/** Aggregated context around one entity (metadata only, read-only). */
+export interface ContextData {
+  type: KnowledgeType;
+  id: string;
+  entity: Record<string, unknown>;
+  relations: Relation[];
+  projects: Project[];
+  agents: Agent[];
+  sessions: AgentSession[];
+  researchProjects: ResearchProject[];
+  papers: Paper[];
+  datasets: Dataset[];
+  experiments: Experiment[];
+  reports: ResearchReport[];
+  notes: ResearchNote[];
+  activities: Activity[];
+  generatedAt: string; // ISO 8601
+}
+
+/** YAML rule definition joined with its SQLite execution state. */
+export interface AutomationRuleState {
+  id: string;
+  name: string;
+  enabled: boolean;
+  triggerType: string;
+  triggerValue?: string | null;
+  actions: string[];
+  runCount: number;
+  lastRunAt?: string | null; // ISO 8601
+}
+
+/* ------------------------------------------------------------------ */
+/* Observability (Phase 10)                                            */
+/* ------------------------------------------------------------------ */
+
+/** One persisted metrics history sample (endpoint `/api/v1/metrics/history`). */
+export interface MetricSample {
+  id: string;
+  nodeId: string;
+  timestamp: string; // ISO 8601
+  cpuPercent: number;
+  memoryPercent: number;
+  diskPercent: number;
+  networkRx: number; // down, Mbps
+  networkTx: number; // up, Mbps
+  metadata: Record<string, unknown>;
+}
+
+export type MetricsRange = "1h" | "6h" | "24h" | "7d";
+
+export interface MetricAggregate {
+  average: number;
+  maximum: number;
+}
+
+export interface MetricsSummary {
+  nodeId: string;
+  range: MetricsRange;
+  samples: number;
+  cpu: MetricAggregate;
+  memory: MetricAggregate;
+  disk: { average: number };
+}
+
+export interface NodeHealthCounts {
+  online: number;
+  offline: number;
+}
+
+export interface ServiceHealthSummary {
+  dockerDaemon: boolean | null; // null = not probed
+  running: number;
+  stopped: number;
+}
+
+export interface RecentError {
+  id: string;
+  type: string;
+  action: string;
+  message: string;
+  timestamp: string; // ISO 8601
+}
+
+export interface HealthSummary {
+  overallScore: number; // 0–100
+  nodeHealth: NodeHealthCounts;
+  serviceHealth: ServiceHealthSummary;
+  recentErrors: RecentError[];
+}
+
+export type AutomationRunStatus = "success" | "failed" | "skipped";
+
+export interface AutomationRun {
+  id: string;
+  ruleId: string;
+  trigger: string;
+  status: AutomationRunStatus;
+  result: Record<string, unknown>;
+  error?: string | null;
+  triggeredAt: string; // ISO 8601
+}

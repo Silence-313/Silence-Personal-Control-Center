@@ -2,6 +2,7 @@
 
 import { StorageOverview } from "@/components/storage/StorageOverview";
 import { Card } from "@/components/ui/Card";
+import { MockDataBadge } from "@/components/ui/MockDataBadge";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SkeletonBlock } from "@/components/ui/Skeleton";
@@ -29,6 +30,7 @@ export default function DataCenterPage() {
           "page.dataCenterDesc",
           "Personal AI Data Center — the 2TB data layer for datasets, models, experiments and more.",
         )}
+        actions={<MockDataBadge domain="storage" />}
       />
 
       <Card>

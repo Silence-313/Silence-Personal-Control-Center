@@ -4,13 +4,10 @@ import { useState } from "react";
 import { Loader2, RotateCcw, ShieldCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
+import { API_BASE } from "@/lib/api-base";
 import { useAuth } from "@/lib/auth";
 import { deviceLabel, getDeviceCode, setAccessToken } from "@/lib/device";
 import { useI18n } from "@/lib/i18n";
-
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, "") ??
-  "http://localhost:8000";
 
 export function PairingGate() {
   const { authorize } = useAuth();

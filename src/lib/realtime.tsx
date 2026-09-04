@@ -12,7 +12,12 @@ import {
 } from "react";
 
 import * as backend from "@/lib/backend";
-import type { NodeStatus, SystemMetrics } from "@/types";
+import type {
+  HealthSummary,
+  MetricSample,
+  NodeStatus,
+  SystemMetrics,
+} from "@/types";
 
 export type ConnectionState = "connecting" | "open" | "reconnecting" | "fallback";
 
@@ -23,10 +28,22 @@ export interface NodeStatusEvent {
   lastSeen: string;
 }
 
+export interface AutomationEvent {
+  ruleId: string;
+  status: string;
+  trigger?: string;
+  error?: string | null;
+  triggeredAt: string;
+}
+
 interface RealtimeContextValue {
   connection: ConnectionState;
   metrics: SystemMetrics | null;
   nodeStatus: NodeStatusEvent | null;
+  /** Real-time metric snapshot history (from `metrics_snapshot` events). */
+  metricSamples: MetricSample[];
+  healthSummary: HealthSummary | null;
+  automationEvents: AutomationEvent[];
   /** Real-time source is currently unavailable (data may be stale). */
   stale: boolean;
 }
@@ -47,6 +64,9 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   const [connection, setConnection] = useState<ConnectionState>("connecting");
   const [metrics, setMetrics] = useState<SystemMetrics | null>(null);
   const [nodeStatus, setNodeStatus] = useState<NodeStatusEvent | null>(null);
+  const [metricSamples, setMetricSamples] = useState<MetricSample[]>([]);
+  const [healthSummary, setHealthSummary] = useState<HealthSummary | null>(null);
+  const [automationEvents, setAutomationEvents] = useState<AutomationEvent[]>([]);
 
   const esRef = useRef<EventSource | null>(null);
   const pollRef = useRef<number | null>(null);
@@ -177,6 +197,69 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       }
     });
 
+    es.addEventListener("metrics_snapshot", (ev) => {
+      try {
+        const raw = JSON.parse((ev as MessageEvent).data) as {
+          node_id: string;
+          timestamp: string;
+          cpu_percent: number;
+          memory_percent: number;
+          disk_percent: number;
+          network_rx: number;
+          network_tx: number;
+          metadata?: Record<string, unknown>;
+        };
+        setMetricSamples((prev) => {
+          const sample: MetricSample = {
+            id: `live-${raw.timestamp}`,
+            nodeId: raw.node_id,
+            timestamp: raw.timestamp,
+            cpuPercent: raw.cpu_percent,
+            memoryPercent: raw.memory_percent,
+            diskPercent: raw.disk_percent,
+            networkRx: raw.network_rx,
+            networkTx: raw.network_tx,
+            metadata: raw.metadata ?? {},
+          };
+          const next = [...prev, sample];
+          return next.length > 120 ? next.slice(next.length - 120) : next;
+        });
+      } catch {
+        /* malformed event */
+      }
+    });
+
+    es.addEventListener("health_update", (ev) => {
+      try {
+        const raw = JSON.parse((ev as MessageEvent).data);
+        setHealthSummary(backend.mapHealthSummary(raw));
+      } catch {
+        /* malformed event */
+      }
+    });
+
+    es.addEventListener("automation_event", (ev) => {
+      try {
+        const raw = JSON.parse((ev as MessageEvent).data) as {
+          rule_id: string;
+          status: string;
+          trigger?: string;
+          error?: string | null;
+          triggered_at: string;
+        };
+        const event: AutomationEvent = {
+          ruleId: raw.rule_id,
+          status: raw.status,
+          trigger: raw.trigger,
+          error: raw.error,
+          triggeredAt: raw.triggered_at,
+        };
+        setAutomationEvents((prev) => [...prev, event].slice(-50));
+      } catch {
+        /* malformed event */
+      }
+    });
+
     es.onerror = () => {
       closeEs();
       if (!aliveRef.current) return;
@@ -230,9 +313,12 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       connection,
       metrics,
       nodeStatus,
+      metricSamples,
+      healthSummary,
+      automationEvents,
       stale: connection !== "open",
     }),
-    [connection, metrics, nodeStatus],
+    [connection, metrics, nodeStatus, metricSamples, healthSummary, automationEvents],
   );
 
   return (
@@ -256,4 +342,16 @@ export function useRealtimeNodeStatus(): NodeStatusEvent | null {
 
 export function useRealtimeConnection(): ConnectionState {
   return useRealtime().connection;
+}
+
+export function useRealtimeMetricSamples(): MetricSample[] {
+  return useRealtime().metricSamples;
+}
+
+export function useRealtimeHealthSummary(): HealthSummary | null {
+  return useRealtime().healthSummary;
+}
+
+export function useRealtimeAutomationEvents(): AutomationEvent[] {
+  return useRealtime().automationEvents;
 }

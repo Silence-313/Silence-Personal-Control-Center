@@ -11,6 +11,8 @@ import {
   type ReactNode,
 } from "react";
 
+import { API_BASE } from "@/lib/api-base";
+
 export type ReachabilityStatus =
   | "checking"
   | "online"
@@ -29,10 +31,6 @@ interface ReachabilityContextValue {
   /** Flip to "online" explicitly (called after waking the display). */
   reportAwake: () => void;
 }
-
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, "") ??
-  "http://localhost:8000";
 
 const POLL_MS = 3000;
 const TIMEOUT_MS = 2500;
