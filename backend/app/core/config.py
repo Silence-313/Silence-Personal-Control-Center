@@ -38,6 +38,12 @@ class Settings(BaseSettings):
     # Research registry (control-plane read model: papers/datasets/experiments/...).
     research_config: str = str(BACKEND_DIR / "config" / "research.yaml")
 
+    # Phase 9 Knowledge & Automation registries (read models).
+    # knowledge.yaml holds manual knowledge overrides/edges; automation.yaml holds
+    # automation rules (triggers + safe actions only).
+    knowledge_config: str = str(BACKEND_DIR / "config" / "knowledge.yaml")
+    automation_config: str = str(BACKEND_DIR / "config" / "automation.yaml")
+
     # Phase 8 runtime observation. research_base is the optional root used to
     # resolve relative path fields in research.yaml (None → relative paths
     # report missing). research_observe_ttl_seconds is the in-memory TTL for

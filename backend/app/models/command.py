@@ -46,3 +46,8 @@ class Activity(SQLModel, table=True):
     agent_id: str | None = None
     session_id: str | None = None
     research_project_id: str | None = None
+    # Phase 10 Step 4 timeline contract. Nullable (idempotent migration); new
+    # records are auto-derived in activity_service.record (severity from
+    # action, category from type) and keep old rows reading back as None.
+    severity: str | None = None
+    category: str | None = None

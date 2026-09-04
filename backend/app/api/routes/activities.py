@@ -28,6 +28,8 @@ def _to_out(a) -> ActivityOut:
         agent_id=a.agent_id,
         session_id=a.session_id,
         research_project_id=a.research_project_id,
+        severity=a.severity,
+        category=a.category,
     )
 
 

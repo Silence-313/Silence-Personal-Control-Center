@@ -19,3 +19,6 @@ class ActivityOut(BaseModel):
     agent_id: str | None = None
     session_id: str | None = None
     research_project_id: str | None = None
+    # Phase 10 Step 4 timeline contract (nullable on old rows).
+    severity: str | None = None
+    category: str | None = None

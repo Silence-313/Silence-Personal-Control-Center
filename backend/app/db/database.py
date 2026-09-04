@@ -42,4 +42,12 @@ def init_db() -> None:
         seeded = session_service.seed_from_registry(db_session)
     if seeded:
         logger.info("session plane seeded", extra={"count": seeded})
+
+    # Phase 9: idempotently rebuild the knowledge index + relation graph from
+    # the registries and live tables (upsert; never touches source YAML).
+    from app.knowledge import service as knowledge_service
+
+    with Session(engine) as db_session:
+        knowledge_service.sync(db_session)
+
     logger.info("database initialized", extra={"database_url": settings.database_url})

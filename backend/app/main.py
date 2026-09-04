@@ -9,14 +9,18 @@ from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlmodel import Session
+from starlette.concurrency import run_in_threadpool
 
-from app.api.routes import activities, agents, auth, commands, events, health, metrics, nodes, power, projects, research, runtime, services, sessions
+from app.api.routes import activities, agents, auth, automation, commands, context, events, health, knowledge, metrics, metrics_history, nodes, power, projects, research, runtime, services, sessions, timeline
 from app.core.config import settings
 from app.core.errors import ApiError
 from app.core.logging import configure_logging
 from app.db.database import engine, init_db
+from app.health import routes as health_summary_routes
+from app.health import service as health_service
+from app.metrics_history import service as metrics_history_service
 from app.schemas.common import ErrorResponse
-from app.services import node_service
+from app.services import metrics_service, node_service, sse_service
 
 logger = logging.getLogger("silence.backend")
 
@@ -38,6 +42,14 @@ async def _heartbeat_loop() -> None:
         try:
             with Session(engine) as session:
                 node_service.heartbeat(session)
+            # Phase 10 Step 1: after the node heartbeat, persist a realtime
+            # metrics sample so history accrues regardless of SSE connections.
+            metrics = await run_in_threadpool(metrics_service.collect)
+            with Session(engine) as session:
+                metrics_history_service.record_sample(session, settings.node_id, metrics)
+                metrics_history_service.cleanup_old_samples(session)
+                # Phase 10 Step 3: persist a light health snapshot (no Docker).
+                health_service.record_snapshot(session)
         except Exception:
             logger.exception("heartbeat failed")
 
@@ -45,6 +57,7 @@ async def _heartbeat_loop() -> None:
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     init_db()
+    sse_service.start_notifications()
     with Session(engine) as session:
         node_service.register_local_node(session)
     task = asyncio.create_task(_heartbeat_loop())
@@ -67,18 +80,34 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
+    # In development, also accept any loopback / RFC1918 origin on any port so a
+    # device that reaches the frontend over the LAN (whose IP changes under
+    # DHCP) can call the API without a hardcoded origin allow-list entry.
+    dev_origin_regex = (
+        r"^https?://(localhost|127\.0\.0\.1|"
+        r"10\.\d+\.\d+\.\d+|"
+        r"192\.168\.\d+\.\d+|"
+        r"172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)"
+        r"(:\d+)?$"
+        if settings.is_development
+        else None
+    )
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.allowed_origin_list,
+        allow_origin_regex=dev_origin_regex,
         allow_credentials=True,
         allow_methods=["GET", "POST"],
         allow_headers=["Authorization", "Content-Type"],
     )
 
     app.include_router(health.router)
+    app.include_router(health_summary_routes.router)
     app.include_router(auth.router)
     app.include_router(nodes.router)
     app.include_router(metrics.router)
+    app.include_router(metrics_history.router)
     app.include_router(services.router)
     app.include_router(power.router)
     app.include_router(commands.router)
@@ -88,7 +117,11 @@ def create_app() -> FastAPI:
     app.include_router(activities.router)
     app.include_router(sessions.router)
     app.include_router(runtime.router)
+    app.include_router(knowledge.router)
+    app.include_router(context.router)
+    app.include_router(automation.router)
     app.include_router(events.router)
+    app.include_router(timeline.router)
 
     # --- uniform error handling (§45) -------------------------------------
     @app.exception_handler(RequestValidationError)

@@ -1,0 +1,12 @@
+# Knowledge manual override registry (read model, Phase 9).
+#
+# The knowledge index is built AUTOMATICALLY from projects.yaml, agents.yaml,
+# research.yaml and the live sessions/activities tables. This file only adds or
+# overrides knowledge items/relations that cannot be auto-derived.
+#
+# `items[].id` is the RAW entity id (namespace prefix is added from `type`).
+# `relations[].source_id` / `target_id` are NAMESPACED ids ("research:research-g1").
+# relation_type ∈ {belongs_to, uses, generated_by, depends_on, references, derived_from}.
+
+items: []
+relations: []

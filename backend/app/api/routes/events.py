@@ -19,6 +19,7 @@ from starlette.concurrency import run_in_threadpool
 from app.core.config import settings
 from app.db.database import engine
 from app.models.node import Node
+from app.health import service as health_service
 from app.services import metrics_service, node_service, sse_service
 
 router = APIRouter(tags=["events"])
@@ -65,20 +66,51 @@ def _node_status() -> dict:
         }
 
 
+def _metrics_snapshot(metrics) -> dict:
+    """The persisted sample shape (Phase 10 Step 1/7): a lightweight point."""
+    return {
+        "node_id": settings.node_id,
+        "timestamp": datetime.now().isoformat(),
+        "cpu_percent": metrics.cpu.usage_percent,
+        "memory_percent": metrics.memory.usage_percent,
+        "disk_percent": metrics.disk.usage_percent,
+        "network_rx": metrics.network.down_mbps,
+        "network_tx": metrics.network.up_mbps,
+        "metadata": {"load_average": metrics.cpu.load_average, "cores": metrics.cpu.cores},
+    }
+
+
+def _health_update() -> dict:
+    with Session(engine) as session:
+        return health_service.compute_summary(session, include_services=False).model_dump(
+            mode="json"
+        )
+
+
 async def event_stream():
     yield _sse("hello", {"time": datetime.now().isoformat()})
     yield _sse("node_status", _node_status())
     metrics = await run_in_threadpool(metrics_service.collect)
     yield _sse("metrics", metrics.model_dump(mode="json"))
+    yield _sse("metrics_snapshot", _metrics_snapshot(metrics))
+    yield _sse("health_update", _health_update())
 
     ticks = 0
     while True:
+        # Phase 9: flush any queued automation `notify` events (non-blocking).
+        async for notification in sse_service.drain_notifications():
+            yield _sse("notification", notification)
+        # Phase 10 Step 7: flush queued automation observability events.
+        async for event in sse_service.drain_automation_events():
+            yield _sse("automation_event", event)
         await asyncio.sleep(_METRICS_INTERVAL)
         metrics = await run_in_threadpool(metrics_service.collect)
         yield _sse("metrics", metrics.model_dump(mode="json"))
+        yield _sse("metrics_snapshot", _metrics_snapshot(metrics))
         ticks += 1
         if ticks * _METRICS_INTERVAL >= _HEARTBEAT_INTERVAL:
             yield _sse("node_status", _node_status())
+            yield _sse("health_update", _health_update())
             ticks = 0
 
 

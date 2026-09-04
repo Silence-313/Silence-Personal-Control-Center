@@ -1,0 +1,36 @@
+# Automation rule registry (read model, Phase 9).
+#
+# Triggers (v1): activity.created | experiment.updated | agent.failed | node.offline | project.changed
+#   `value` optionally scopes the trigger (matches the event's `value`/`action`/`status`).
+# Actions (safe-only): create_activity | notify
+#   NEVER: shell, command, code modification, external webhook.
+#
+# `activity.created` fires automatically from the Activity spine (automation-
+# originated activities are excluded to avoid loops). The other triggers are
+# matchable and unit-tested but have no production emitter yet (registries are
+# static, and the heartbeat loop has no offline detector) — see Phase 9 report.
+
+rules:
+  - id: failed-activity-alert
+    name: Failed Activity Alert
+    enabled: true
+    trigger:
+      type: activity.created
+      value: failed
+    actions:
+      - type: notify
+        message: "System event: {message}"
+      - type: create_activity
+        message: "Automation: activity {id} entered state {value}"
+
+  - id: node-offline-alert
+    name: Node Offline Alert
+    enabled: true
+    trigger:
+      type: node.offline
+      value: offline
+    actions:
+      - type: notify
+        message: "Node {entity_id} went offline"
+      - type: create_activity
+        message: "Automation: node {entity_id} went offline"

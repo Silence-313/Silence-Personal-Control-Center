@@ -23,6 +23,12 @@ _ACTIVITIES_ASSOCIATION_COLUMNS = (
     "research_project_id",
 )
 
+# Phase 10 Step 4 timeline columns (nullable, additive).
+_ACTIVITIES_TIMELINE_COLUMNS = (
+    "severity",
+    "category",
+)
+
 
 def _table_columns(engine, table: str) -> set[str]:
     with engine.connect() as conn:
@@ -50,9 +56,28 @@ def _migrate_activities(engine) -> None:
             logger.info("migration: activities + %s", column)
 
 
+def _migrate_activity_timeline(engine) -> None:
+    """Add Activity severity/category columns when missing (idempotent)."""
+    existing = _table_columns(engine, "activities")
+    if not existing:
+        logger.debug("migration: activities table absent, nothing to alter")
+        return
+    missing = [c for c in _ACTIVITIES_TIMELINE_COLUMNS if c not in existing]
+    if not missing:
+        logger.debug("migration: activity timeline already up to date")
+        return
+    with engine.begin() as conn:
+        for column in missing:
+            conn.exec_driver_sql(
+                f"ALTER TABLE activities ADD COLUMN {column} VARCHAR"
+            )
+            logger.info("migration: activities + %s", column)
+
+
 def migrate(engine) -> None:
     """Apply all registered idempotent migrations (safe to re-run).
 
     Call after ``SQLModel.metadata.create_all`` on startup and in tests.
     """
     _migrate_activities(engine)
+    _migrate_activity_timeline(engine)
