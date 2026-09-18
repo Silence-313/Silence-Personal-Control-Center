@@ -7,7 +7,7 @@
 
 ------------------------------------------------------------------------
 
-## 1. Project Vision
+# 1. Project Vision
 
 ``` text
                     iPad Air M4
@@ -44,32 +44,74 @@
 
 ------------------------------------------------------------------------
 
-# 2. Current Status
+# 2. 现状总览 (Status Overview)
 
-截至当前（已实现至 Phase 10）：
+> 一句话：**Phase 0–10 已全部完成，控制台已在 iPad 上真实可用**；
+> 但 Robotics / Data Center / Tasks 三处仍是**演示数据**，执行面尚未开放。
 
-| Phase | 名称 | 状态 |
-|---|---|---|
-| Phase 0 | Environment & Capability Audit | ✅ Complete |
-| Phase 1 | System Architecture | ✅ Complete |
-| Phase 2 | UI / UX Prototype | ✅ Complete |
-| Phase 3 | Backend + Node Foundation | ✅ Complete |
-| Phase 4 | Frontend Integration + Realtime | ✅ Complete |
-| Phase 5 | Projects Control Plane | ✅ Complete |
-| Phase 6 | Agent Control Plane | ✅ Complete |
-| Phase 7 | Research Control Plane | ✅ Complete |
-| Phase 8 | Runtime & Activity (Session) Plane | ✅ Complete |
-| Phase 9 | Knowledge & Automation Plane | ✅ Complete |
-| Phase 10 | Observability & Intelligence Plane | ✅ Complete |
-| 后续 | Execution / Security / Tailscale / PWA / Deployment | ⏳ Planned |
+## 2.1 ✅ 已完成 —— 现在能用的（都做了什么）
 
-> 说明 1：相比早期路线图，实施顺序做了重排——Research 提前为 Phase 7，
-> Session+Activity 顺延为 Phase 8，Knowledge+Automation 与 Observability 提前插入。
->
-> 说明 2：Robotics 与 Data Center 目前只有前端界面 + 演示数据（详见
-> `docs/USER_GUIDE.md` §9），真实后端待后续阶段接入。
->
-> Phase 数量与边界允许根据实际开发情况调整。
+**控制面（真实后端数据）：**
+
+| 能力 | 说明 |
+|---|---|
+| 节点 & 指标 | Mac 节点注册、CPU / 内存 / 磁盘 / 网络实时指标、心跳 |
+| 服务 & Docker | Docker 容器运行 / 停止数量（只读） |
+| 电源 | 屏幕睡眠 / 唤醒（唯一的「执行」能力，需设备授权 + 管理员 token） |
+| 项目 Projects | Git 只读：分支 / 远端 / HEAD / ahead-behind / 工作区 / 健康 / 最近提交 |
+| 智能体 Agents | Agent 注册表 + 详情 + 状态 + 关联项目 / 会话 / 任务 |
+| 会话 Sessions | Session 生命周期 + 关联智能体 / 项目 / 研究 |
+| 研究 Research | 论文 / 项目 / 实验 / 数据集 / 笔记 / 报告 六类实体 + 筛选 |
+| 知识 Knowledge | 自动索引知识图谱 + 搜索 / 类型过滤 + 上下文聚合视图 |
+| 自动化 Automation | YAML 规则引擎，仅 notify / create_activity 两类安全动作 |
+| 可观测性 Observability | 指标历史、健康评分、事件时间线（严重度 / 分类）、自动化运行记录 |
+| 活动 Activity | 全系统统一事件时间线 |
+
+**基础设施（跨页面）：**
+
+- iPad Safari / PWA：manifest + 图标 + 「添加到主屏幕」
+- 设备配对：设备码 + Mac 弹 6 位验证码 → access_token（见 `docs/USER_GUIDE.md` §4）
+- 实时：SSE + 8s 轮询兜底；明确区分 online / sleeping / offline / stale
+- 中英双语；演示数据徽章（`演示数据` / `DEMO DATA`）
+- API 地址随页面 Origin 自动推导（局域网 IP 变化无需改配置）
+
+## 2.2 🚧 未完成 —— 还没弄的
+
+**仍是演示数据（真实后端未接入）：**
+
+- 🤖 Robotics `/robotics` 整页（机器人 / 训练 / 实验）
+- 🗄 Data Center `/data-center` 整页（2TB 数据层存储）
+- ✅ 工作台「当前任务」区块（Tasks）
+
+**执行面（Execution Plane）尚未开放** —— 目前唯一执行能力是屏幕睡眠 / 唤醒。
+尚未实现：Docker 控制、Git 写入、命令 / Shell 执行、Agent 驱动、研究工作流、
+机器人 / 训练控制。
+
+**其他未做：**
+
+- Security Hardening（只有基础配对 + LAN + 最小权限，正式加固未做）
+- Tailscale 远程访问（现仅局域网）
+- PWA 深优化（离线 shell / 深度安装 / 后台行为）
+- E2E / 一键启停 / 部署 / CI
+- 文档补全（API.md / SECURITY.md / DEPLOYMENT.md / ARCHITECTURE.md）
+
+## 2.3 📜 开发历程 —— 都做过什么（Phase 0 → 10）
+
+| Phase | 名称 | 做了什么 | 状态 |
+|---|---|---|---|
+| 0 | Environment & Capability Audit | Mac 能力盘点（CPU / RAM / 网络 / 电源 / Docker…） | ✅ |
+| 1 | System Architecture | 前端 / 后端 / DB / 设备模型 / Adapter 架构定案 | ✅ |
+| 2 | UI/UX Prototype | 13" iPad 横屏、Dark、Command Center 风格 | ✅ |
+| 3 | Backend + Node Foundation | FastAPI；节点 / 指标 / 服务 / 电源；Git + Docker 只读；设备配对 | ✅ |
+| 4 | Frontend Integration + Realtime | REST + SSE + 轮询兜底；离线 / stale；Dashboard 实时 | ✅ |
+| 5 | Projects Control Plane | Git 只读项目控制面 | ✅ |
+| 6 | Agent Control Plane | Agent 注册 / 详情 / 状态；Session 读模型；活动关联 | ✅ |
+| 7 | Research Control Plane | 研究六类实体 | ✅ |
+| 8 | Runtime & Activity Plane | Session 生命周期 + 统一活动时间线 | ✅ |
+| 9 | Knowledge & Automation Plane | 知识图谱 + 上下文聚合 + 规则引擎 | ✅ |
+| 10 | Observability & Intelligence Plane | 指标历史 / 健康 / 时间线 / 自动化运行 | ✅ |
+
+> 每阶段完整报告见 `docs/phase-*-report.md`；使用指南见 `docs/USER_GUIDE.md`。
 
 ------------------------------------------------------------------------
 
@@ -164,661 +206,33 @@ WebSocket
 
 ------------------------------------------------------------------------
 
-# 5. Phase Roadmap
+# 5. 未来路线图（Planned —— 还没做的）
 
-> ⚠️ 本节为最早规划的逐阶段路线图（命名/顺序已被实际实施重排，权威状态见上文
-> §2 表格）。Robotics 与 Data Center 目前仅前端 + 演示数据。
-> 使用指南见 `docs/USER_GUIDE.md`，Phase 10 汇报见 `docs/phase-10-report.md`。
+> 以下均处于「未开始」或「部分完成」。当前已完成至 Phase 10（见 §2.3）。
 
-## Phase 0 --- Environment & Capability Audit
+| 计划 | 内容 | 状态 |
+|---|---|---|
+| Robotics 后端接入 | G1 / N2 / GMR / GVHMR、MuJoCo、RL、运动数据集（现为演示数据） | ⏳ 未开始 |
+| Data Center 后端接入 | 2TB SSD：数据集 / 模型 / 论文 / 视频 / 实验 / 检查点 / 制品 / 智能体 / 记忆 / 备份 | ⏳ 未开始 |
+| Execution Plane | Docker 控制、Git 写入、命令执行、Agent 驱动、研究工作流、机器人 / 训练控制 | ⏳ 未开始 |
+| Security Hardening | 鉴权 / 授权 / 能力权限 / 审计 / 限流 / 密钥处理 | ⏳ 未开始 |
+| Tailscale | iPad → Tailscale → Mac / Mac Studio / GPU Server 远程访问 | ⏳ 未开始 |
+| PWA 深优化 | 离线 shell、安装深度、后台行为、重连、电池 | 🚧 部分 |
+| E2E / Deployment | 完整链路测试、一键启停 / 更新 | ⏳ 未开始 |
+| Documentation | API.md / SECURITY.md / DEPLOYMENT.md / ARCHITECTURE.md | 🚧 部分 |
 
-目标：
+**Execution Plane 的前置安全边界（未满足前不开放执行能力）：**
 
-> 知道现有 Mac 能提供什么能力，并确认哪些能力可以安全复用。
-
-审计：
-
--   macOS / CPU / RAM / Disk
--   Homebrew
--   Node / npm / pnpm
--   Python / uv / Conda
--   Git / SSH
--   Docker
--   Network
--   Power / Sleep / Wake
--   当前服务
-
-输出：
-
-``` text
-docs/phase-0-environment-audit.md
-```
-
-状态：**Complete**
+- Authentication / Authorization
+- Capability-based permission
+- Audit log
+- Confirmation（危险操作二次确认）
+- Rate limiting
+- Safe command boundary
 
 ------------------------------------------------------------------------
 
-## Phase 1 --- System Architecture
-
-确定：
-
--   Frontend
--   Backend
--   Database
--   Network
--   Authentication
--   Storage
--   Realtime
--   Device Model
--   Adapter System
--   Deployment
-
-核心：
-
-``` text
-iPad
- ↓
-Web / PWA
- ↓
-Network
- ↓
-Next.js
- ↓
-FastAPI
- ↓
-Control Plane
- ↓
-Adapters
- ↓
-Nodes
-```
-
-状态：**Complete**
-
-------------------------------------------------------------------------
-
-## Phase 2 --- UI / UX Prototype
-
-目标：
-
-> 先确定 iPad 上的 Personal Control Center 应该长什么样。
-
-主要页面：
-
-``` text
-Dashboard
-Devices
-Projects
-Agents
-Research
-Robotics
-Data Center
-Activity
-```
-
-重点：
-
--   13" iPad
--   横屏优先
--   Touch
--   Dark Mode
--   信息密度
--   Command Center 风格
-
-状态：**Complete**
-
-------------------------------------------------------------------------
-
-## Phase 3 --- Backend + Node Foundation
-
-建立：
-
-``` text
-FastAPI
-  │
-  ├── Node
-  ├── Metrics
-  ├── Services
-  ├── Power
-  ├── Projects
-  ├── Activities
-  ├── Commands
-  └── Events
-```
-
-实现：
-
--   Node Agent
--   System metrics
--   Docker read-only
--   Git read-only
--   Storage
--   Power
--   Sleep / Wake
--   Device pairing
--   Access token
--   SSE 基础设施
-
-状态：**Complete**
-
-------------------------------------------------------------------------
-
-## Phase 4 --- Frontend Integration + Realtime
-
-核心目标：
-
-``` text
-REST initial state
-        +
-SSE realtime
-        +
-Polling fallback
-        +
-Offline / Stale state
-```
-
-实现：
-
--   Real API client
--   SSE RealtimeProvider
--   Device authentication
--   Dashboard realtime
--   Sleep / Wake UI
--   Offline / stale distinction
--   Frontend test infrastructure
--   iPad LAN validation
-
-状态：**Complete**
-
-------------------------------------------------------------------------
-
-## Phase 5 --- Projects Control Plane
-
-目标：
-
-> 将 Project 从静态展示升级为真实的只读 Project Control Plane。
-
-当前 Project：
-
-``` text
-Project
-├── node_id
-├── repositoryPath
-├── branch
-├── remote
-├── ahead
-├── behind
-├── head
-├── workingTree
-├── health
-└── lastCommit
-```
-
-能力：
-
--   Project list
--   Project detail
--   Real Git status
--   Remote
--   Ahead / Behind
--   Full HEAD
--   Node association
--   Health aggregation
--   30s refresh
--   Mock / Real alignment
-
-安全边界：
-
-> Git 全程只读。
-
-状态：**Complete**
-
-------------------------------------------------------------------------
-
-# 6. Phase 6 --- Agent Control Plane
-
-## Goal
-
-Phase 6 不负责开发 Coding Agent 本体。
-
-它负责：
-
-> **让 Control Center 能够认识、注册、观察和组织 Agent。**
-
-目标模型：
-
-``` text
-Node
- │
- └── Project
-       │
-       ├── Agent
-       │     └── Session
-       │
-       └── Activity
-```
-
-核心对象：
-
-``` text
-Agent
-Agent Session
-Activity association
-Project association
-```
-
-### Agent
-
-建议字段：
-
-``` text
-id
-name
-type
-description
-status
-node_id
-current_project_id
-current_session_id
-current_task
-last_activity_at
-capabilities
-metadata
-```
-
-状态：
-
-``` text
-offline
-idle
-running
-error
-unknown
-```
-
-### Phase 6 必须实现
-
--   Agent Registry
--   Agent domain model
--   Agent REST API
--   Agent list
--   Agent detail
--   Agent status
--   Agent → Project association
--   Agent Session read model
--   Activity → Agent association
--   Activity → Session association
--   Activity → Project association
--   Dashboard Agent summary
--   Frontend / Backend tests
--   iPad validation
-
-### Phase 6 明确禁止
-
--   不开发 Coding Agent
--   不修改 Second Brain
--   不执行 shell
--   不执行任意命令
--   不执行 Git write
--   不 commit / push / pull / checkout / reset
--   不启动训练
--   不控制机器人
--   不执行 Research workflow
--   不实现 Agent execution endpoint
-
-原则：
-
-> **Phase 6 负责"认识 Agent"，Execution Plane 才负责"驱动 Agent"。**
-
-状态：**Complete**
-
-------------------------------------------------------------------------
-
-# 7. Phase 7 --- Session & Activity Plane
-
-目标：
-
-> 建立 Agent Session 与统一 Activity Model。
-
-最终：
-
-``` text
-Project
-   │
-   ├── Agent
-   │    └── Session
-   │          └── Activities
-   │
-   └── Git
-```
-
-关注：
-
--   Session lifecycle
--   Activity timeline
--   Project / Agent / Node 关联
--   Dashboard activity feed
--   Realtime activity
-
-------------------------------------------------------------------------
-
-# 8. Phase 8 --- Research Control Plane
-
-建立：
-
-``` text
-Research
-├── Papers
-├── Projects
-├── Experiments
-├── Datasets
-├── Notes
-└── Reports
-```
-
-第一阶段重点：
-
--   Status
--   Metadata
--   Experiments
--   Logs
--   Metrics
--   Reports
-
-不立即实现完整 Research Agent。
-
-------------------------------------------------------------------------
-
-# 9. Phase 9 --- Robotics Control Plane
-
-建立：
-
-``` text
-Robotics
-├── G1
-├── N2
-├── GMR
-├── GVHMR
-├── MuJoCo
-├── RL
-└── Motion Dataset
-```
-
-重点：
-
--   Simulation status
--   Training status
--   Experiment metadata
--   Logs
--   Metrics
--   Checkpoints
-
-不立即开放高风险机器人执行控制。
-
-------------------------------------------------------------------------
-
-# 10. Phase 10 --- Personal AI Data Center
-
-接入 2TB SSD：
-
-``` text
-Personal AI Data Center
-├── datasets
-├── models
-├── papers
-├── videos
-├── experiments
-├── checkpoints
-├── artifacts
-├── agent
-├── memory
-└── backups
-```
-
-实现：
-
--   Storage overview
--   Category statistics
--   Capacity
--   File metadata
--   Data organization
-
-之后再考虑真正的文件管理。
-
-------------------------------------------------------------------------
-
-# 11. Phase 11 --- Execution Plane
-
-这是整个系统从：
-
-> Observe
-
-进入：
-
-> Act
-
-的阶段。
-
-可能包括：
-
-``` text
-Agent execution
-Docker control
-Terminal / command execution
-Git write operations
-Research workflows
-Robotics training
-Simulation control
-```
-
-所有执行能力必须：
-
--   Authentication
--   Authorization
--   Capability based permission
--   Audit log
--   Confirmation
--   Rate limiting
--   Safe command boundary
-
-**Execution Plane 不应提前进入 Phase 6。**
-
-------------------------------------------------------------------------
-
-# 12. Phase 12 --- Security Hardening
-
-重点：
-
--   Authentication
--   Authorization
--   Device identity
--   Capability permissions
--   Session management
--   CORS
--   Rate limiting
--   Audit log
--   Secret handling
--   API hardening
--   Command permission
-
-特别保护：
-
-``` text
-Sleep / Wake
-Docker
-Agent
-Training
-Robot
-Git Write
-Shell
-```
-
-------------------------------------------------------------------------
-
-# 13. Phase 13 --- Remote Access / Tailscale
-
-目标：
-
-``` text
-iPad
- ↓
-Tailscale
- ↓
-Mac / Mac Studio / Server
-```
-
-支持未来：
-
-``` text
-MacBook Pro
-Mac Studio
-Linux Server
-GPU Server
-Cloud GPU
-```
-
-------------------------------------------------------------------------
-
-# 14. Phase 14 --- PWA / iPad Optimization
-
-目标：
-
-``` text
-Safari
- ↓
-Add to Home Screen
- ↓
-Silence Personal Control Center
-```
-
-优化：
-
--   iPad viewport
--   Touch targets
--   Orientation
--   Offline shell
--   Installability
--   Battery usage
--   Background behavior
--   Reconnection
-
-------------------------------------------------------------------------
-
-# 15. Phase 15 --- Observability & Monitoring
-
-统一观察：
-
-``` text
-Node
-Service
-Agent
-Session
-Research
-Robotics
-Data
-```
-
-建立：
-
--   Health
--   Metrics
--   Logs
--   Events
--   Alerts
-
-------------------------------------------------------------------------
-
-# 16. Phase 16 --- Full Integration / E2E
-
-完整链路：
-
-``` text
-iPad
- ↓
-Network
- ↓
-Web
- ↓
-FastAPI
- ↓
-Control Plane
- ↓
-Node
- ↓
-Adapters
- ↓
-Mac
-```
-
-测试：
-
--   Awake
--   Sleep
--   Wake
--   Offline
--   Reconnect
--   Docker failure
--   Backend failure
--   Network interruption
--   Agent offline
--   Project unavailable
--   stale data
-
-------------------------------------------------------------------------
-
-# 17. Phase 17 --- Deployment
-
-目标：
-
-``` text
-一键启动
-一键停止
-一键更新
-```
-
-最终支持：
-
--   Local development
--   Local production
--   MacBook deployment
--   Future Mac Studio deployment
-
-------------------------------------------------------------------------
-
-# 18. Phase 18 --- Documentation
-
-最终文档：
-
-``` text
-README.md
-docs/USER_GUIDE.md
-ARCHITECTURE.md
-API.md
-DEPLOYMENT.md
-SECURITY.md
-TROUBLESHOOTING.md
-```
-
-并保留：
-
-``` text
-docs/
-├── phase-0-*
-├── phase-1-*
-├── phase-2-*
-├── phase-3-*
-├── phase-4-*
-├── phase-5-*
-├── phase-6-*
-├── phase-7-*
-├── phase-8-*
-├── phase-9-*
-└── phase-10-*
-```
-
-------------------------------------------------------------------------
-
-# 19. Core Architectural Rules
+# 6. Core Architectural Rules
 
 ## Rule 1 --- Local-first
 
@@ -912,7 +326,7 @@ Compute / Execution
 
 ------------------------------------------------------------------------
 
-# 20. Future Hardware
+# 7. Future Hardware
 
 当前：
 
@@ -941,7 +355,7 @@ Node
 
 ------------------------------------------------------------------------
 
-# 21. Current Development Principle
+# 8. Current Development Principle
 
 每个 Phase 都遵循：
 
@@ -971,22 +385,25 @@ Next Phase
 
 ------------------------------------------------------------------------
 
-# 22. Current Next Step
+# 9. Current Next Step
 
 当前 **Phase 10（Observability & Intelligence Plane）已完成**。
 
-下一步候选（按优先级）：
+- 「现在弄了什么 / 没弄什么 / 都做过什么」→ 见 **§2 现状总览**
+- 未来完整计划与安全边界 → 见 **§5 未来路线图**
+
+**建议的下一步（按优先级）：**
 
 1. **Robotics 真实后端接入** —— 目前 `/robotics` 整页为演示数据。
 2. **Data Center 真实存储接入** —— 目前 `/data-center` 整页为演示数据（2TB 数据层）。
-3. **Execution Plane（执行面）** —— 命令 / Docker / Agent 驱动，需严格鉴权、能力权限与审计日志。
+3. **Execution Plane（执行面）** —— 命令 / Docker / Agent 驱动，需先满足 §5 的鉴权 / 权限 / 审计边界。
 4. **细节打磨** —— 补齐 `docs/USER_GUIDE.md` 中标注「演示数据」的内容（机器人 / 存储 / 任务）。
 
 详细使用见 `docs/USER_GUIDE.md`；Phase 10 汇报见 `docs/phase-10-report.md`。
 
 ------------------------------------------------------------------------
 
-# 23. Project Philosophy
+# 10. Project Philosophy
 
 这个项目不是：
 
